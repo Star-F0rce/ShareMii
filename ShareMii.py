@@ -427,25 +427,25 @@ fileVar=tk.StringVar(value="Drag & drop or choose Mii here")
 
 ttk.Label(root, text="ShareMii GUI", font=("",18,"bold")).grid(row=0, column=1, padx=5, pady=5)
 
-ttk.Label(root, text="Select Save Folder:").grid(row=1, column=0, padx=5, pady=5, sticky=tk.E)
+ttk.Label(root, text="Select Mode:").grid(row=1, column=0, padx=5, pady=5, sticky=tk.E)
+modeEntry = ttk.OptionMenu(root, modeVar, "Import","Import", "Export", "List").grid(row=1, column=1, padx=5, pady=5, sticky=tk.W)
+
+ttk.Label(root, text="Select Save Folder:").grid(row=2, column=0, padx=5, pady=5, sticky=tk.E)
 folderEntry = ttk.Entry(root, textvariable=folderVar, width=50)
 folderEntry.drop_target_register(DND_FILES)
 folderEntry.dnd_bind('<<Drop>>',dragndrop)
-folderEntry.grid(row=1, column=1, padx=5, pady=5,sticky=tk.NSEW)
-browseButton = ttk.Button(root, text="Browse...", width=12, command=browse_folder).grid(row=1, column=2, padx=3, pady=3, sticky=tk.W)
+folderEntry.grid(row=2, column=1, padx=5, pady=5,sticky=tk.NSEW)
+browseButton = ttk.Button(root, text="Browse...", width=12, command=browse_folder).grid(row=2, column=2, padx=3, pady=3, sticky=tk.W)
 
-ttk.Label(root, text="Open/Save As Mii:").grid(row=2, column=0, padx=5, pady=5, sticky=tk.E)
+ttk.Label(root, text="Open/Save As Mii:").grid(row=3, column=0, padx=5, pady=5, sticky=tk.E)
 fileEntry = ttk.Entry(root, textvariable=fileVar, width=50)
 fileEntry.drop_target_register(DND_FILES)
 fileEntry.dnd_bind('<<Drop>>',dragndrop)
-fileEntry.grid(row=2, column=1, padx=5, pady=5,sticky=tk.NSEW)
-browseButton = ttk.Button(root, text="Browse...", width=12, command=browse_file).grid(row=2, column=2, padx=3, pady=3, sticky=tk.W)
+fileEntry.grid(row=3, column=1, padx=5, pady=5,sticky=tk.NSEW)
+browseButton = ttk.Button(root, text="Browse...", width=12, command=browse_file).grid(row=3, column=2, padx=3, pady=3, sticky=tk.W)
 
-ttk.Label(root, text="Select Slot:").grid(row=3, column=0, padx=5, pady=5, sticky=tk.E)
-slotEntry = ttk.Entry(root, textvariable=slotVar, width=5).grid(row=3, column=1, padx=5, pady=5, sticky=tk.W)
-
-ttk.Label(root, text="Select Mode:").grid(row=4, column=0, padx=5, pady=5, sticky=tk.E)
-modeEntry = ttk.OptionMenu(root, modeVar, "Import","Import", "Export", "List").grid(row=4, column=1, padx=5, pady=5, sticky=tk.W)
+ttk.Label(root, text="Select Slot:").grid(row=4, column=0, padx=5, pady=5, sticky=tk.E)
+slotEntry = ttk.Entry(root, textvariable=slotVar, width=5).grid(row=4, column=1, padx=5, pady=5, sticky=tk.W)
 
 startButton = ttk.Button(root, text="Start!", command=beginProcess, width=20).grid(row=5, column=1, padx=5, pady=5)
 
