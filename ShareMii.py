@@ -408,7 +408,7 @@ def beginProcess():
 
     ShareMii(mode, slot, folder, file)
 
-##GUI
+##GUI Setup
 root = TkinterDnD.Tk()
 root.title("ShareMii")
 root.iconphoto(False, tk.PhotoImage(file=resourcePath("icon.png")))
@@ -425,11 +425,14 @@ slotVar=tk.StringVar(value="1")
 folderVar=tk.StringVar(value="Drag & drop or upload save folder here")
 fileVar=tk.StringVar(value="Drag & drop or choose Mii here")
 
+## Row 0
 ttk.Label(root, text="ShareMii", font=("",18,"bold")).grid(row=0, column=1, padx=5, pady=5)
 
+## Row 1
 ttk.Label(root, text="Select Mode:").grid(row=1, column=0, padx=5, pady=5, sticky=tk.E)
 modeEntry = ttk.OptionMenu(root, modeVar, "Import","Import", "Export", "List").grid(row=1, column=1, padx=5, pady=5, sticky=tk.W)
 
+## Row 2
 ttk.Label(root, text="Select Save Folder:").grid(row=2, column=0, padx=5, pady=5, sticky=tk.E)
 folderEntry = ttk.Entry(root, textvariable=folderVar, width=50)
 folderEntry.drop_target_register(DND_FILES)
@@ -437,6 +440,7 @@ folderEntry.dnd_bind('<<Drop>>',dragndrop)
 folderEntry.grid(row=2, column=1, padx=5, pady=5,sticky=tk.NSEW)
 browseButton = ttk.Button(root, text="Browse...", width=12, command=browseFolder).grid(row=2, column=2, padx=3, pady=3, sticky=tk.W)
 
+## Row 3
 ttk.Label(root, text="Open/Save As Mii:").grid(row=3, column=0, padx=5, pady=5, sticky=tk.E)
 fileEntry = ttk.Entry(root, textvariable=fileVar, width=50)
 fileEntry.drop_target_register(DND_FILES)
@@ -444,17 +448,21 @@ fileEntry.dnd_bind('<<Drop>>',dragndrop)
 fileEntry.grid(row=3, column=1, padx=5, pady=5,sticky=tk.NSEW)
 browseButton = ttk.Button(root, text="Browse...", width=12, command=browseFile).grid(row=3, column=2, padx=3, pady=3, sticky=tk.W)
 
+## Row 4
 ttk.Label(root, text="Select Slot:").grid(row=4, column=0, padx=5, pady=5, sticky=tk.E)
 slotEntry = ttk.Entry(root, textvariable=slotVar, width=5).grid(row=4, column=1, padx=5, pady=5, sticky=tk.W)
 
+## Row 5
 startButton = ttk.Button(root, text="Start!", command=beginProcess, width=20).grid(row=5, column=1, padx=5, pady=5)
 
+## Row 6
 guiOutput = ScrolledText(root,height=10,width=40)
 guiOutput.grid(row=6, column=1,sticky=tk.NSEW)
 
 sv_ttk.set_theme(darkdetect.theme())
 
-## CLI
+## Run script
+## Using any args causes the CLI to activate, using none will start the GUI
 if args.l:
     modeVar = "List"
     fileVar = 1
