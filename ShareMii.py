@@ -24,6 +24,15 @@ class TextRedirector():
     def flush(self):
         pass
 
+## Used for GUI icon
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 ## Used to browse folders in GUI
 def browse_folder():
     # Opens folder selection dialog
@@ -402,7 +411,7 @@ def beginProcess():
 ##GUI
 root = TkinterDnD.Tk()
 root.title("ShareMii")
-root.iconphoto(False, tk.PhotoImage(file='icon.png'))
+root.iconphoto(False, tk.PhotoImage(file=resource_path("icon.png")))
 root.geometry("800x450")
 root.rowconfigure(6, weight=1)
 root.columnconfigure(0, weight=1)
