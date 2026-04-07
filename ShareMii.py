@@ -25,33 +25,33 @@ class TextRedirector():
         pass
 
 ## Used for GUI icon
-def resource_path(relative_path):
+def resourcePath(relativePath):
     try:
-        base_path = sys._MEIPASS
+        basePath = sys._MEIPASS
     except Exception:
-        base_path = os.path.abspath(".")
+        basePath = os.path.abspath(".")
 
-    return os.path.join(base_path, relative_path)
+    return os.path.join(basePath, relativePath)
 
 ## Used to browse folders in GUI
-def browse_folder():
+def browseFolder():
     # Opens folder selection dialog
-    selected_directory = filedialog.askdirectory()
-    if selected_directory:
-        folderVar.set(selected_directory)
+    selectedDirectory = filedialog.askdirectory()
+    if selectedDirectory:
+        folderVar.set(selectedDirectory)
         guiOutput.delete("1.0", "end")
-        ShareMii("List", 1, selected_directory, "2")
+        ShareMii("List", 1, selectedDirectory, "2")
 
 ## Used to browse files in GUI
-def browse_file():
+def browseFile():
     # Opens folder selection dialog
     if modeVar.get() == "Import":
-        selected_directory = filedialog.askopenfilename(defaultextension=".ltd", filetypes=[('LtD Mii Files', '*.ltd')])
+        selectedDirectory = filedialog.askopenfilename(defaultextension=".ltd", filetypes=[('LtD Mii Files', '*.ltd')])
     else:
-        selected_directory = filedialog.asksaveasfilename(defaultextension=".ltd", filetypes=[('LtD Mii Files', '*.ltd')])
+        selectedDirectory = filedialog.asksaveasfilename(defaultextension=".ltd", filetypes=[('LtD Mii Files', '*.ltd')])
     
-    if selected_directory:
-        fileVar.set(selected_directory)
+    if selectedDirectory:
+        fileVar.set(selectedDirectory)
 
 ## Handles the drag 'n drop for the GUI
 def dragndrop(event):
@@ -411,7 +411,7 @@ def beginProcess():
 ##GUI
 root = TkinterDnD.Tk()
 root.title("ShareMii")
-root.iconphoto(False, tk.PhotoImage(file=resource_path("icon.png")))
+root.iconphoto(False, tk.PhotoImage(file=resourcePath("icon.png")))
 root.geometry("800x450")
 root.rowconfigure(6, weight=1)
 root.columnconfigure(0, weight=1)
@@ -425,7 +425,7 @@ slotVar=tk.StringVar(value="1")
 folderVar=tk.StringVar(value="Drag & drop or upload save folder here")
 fileVar=tk.StringVar(value="Drag & drop or choose Mii here")
 
-ttk.Label(root, text="ShareMii GUI", font=("",18,"bold")).grid(row=0, column=1, padx=5, pady=5)
+ttk.Label(root, text="ShareMii", font=("",18,"bold")).grid(row=0, column=1, padx=5, pady=5)
 
 ttk.Label(root, text="Select Mode:").grid(row=1, column=0, padx=5, pady=5, sticky=tk.E)
 modeEntry = ttk.OptionMenu(root, modeVar, "Import","Import", "Export", "List").grid(row=1, column=1, padx=5, pady=5, sticky=tk.W)
@@ -435,14 +435,14 @@ folderEntry = ttk.Entry(root, textvariable=folderVar, width=50)
 folderEntry.drop_target_register(DND_FILES)
 folderEntry.dnd_bind('<<Drop>>',dragndrop)
 folderEntry.grid(row=2, column=1, padx=5, pady=5,sticky=tk.NSEW)
-browseButton = ttk.Button(root, text="Browse...", width=12, command=browse_folder).grid(row=2, column=2, padx=3, pady=3, sticky=tk.W)
+browseButton = ttk.Button(root, text="Browse...", width=12, command=browseFolder).grid(row=2, column=2, padx=3, pady=3, sticky=tk.W)
 
 ttk.Label(root, text="Open/Save As Mii:").grid(row=3, column=0, padx=5, pady=5, sticky=tk.E)
 fileEntry = ttk.Entry(root, textvariable=fileVar, width=50)
 fileEntry.drop_target_register(DND_FILES)
 fileEntry.dnd_bind('<<Drop>>',dragndrop)
 fileEntry.grid(row=3, column=1, padx=5, pady=5,sticky=tk.NSEW)
-browseButton = ttk.Button(root, text="Browse...", width=12, command=browse_file).grid(row=3, column=2, padx=3, pady=3, sticky=tk.W)
+browseButton = ttk.Button(root, text="Browse...", width=12, command=browseFile).grid(row=3, column=2, padx=3, pady=3, sticky=tk.W)
 
 ttk.Label(root, text="Select Slot:").grid(row=4, column=0, padx=5, pady=5, sticky=tk.E)
 slotEntry = ttk.Entry(root, textvariable=slotVar, width=5).grid(row=4, column=1, padx=5, pady=5, sticky=tk.W)
