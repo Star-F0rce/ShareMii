@@ -11,6 +11,10 @@ from tkinter import filedialog
 from tkinter.scrolledtext import ScrolledText
 from tkinterdnd2 import DND_FILES, TkinterDnD
 
+majVersion = 3
+minVersion = 0
+versionStr = str(majVersion) + "." + str(minVersion)
+
 ## This is to output the command line to the GUI
 class TextRedirector():
     def __init__(self,widget, tag=None):
@@ -81,7 +85,7 @@ def EncodeSexuality(bits: list[int]) -> bytearray:
 
     return result
 
-parser = argparse.ArgumentParser(description="ShareMii v2.2 - Import/Export Living the Dream Miis!")
+parser = argparse.ArgumentParser(description="ShareMii v" + versionStr +" - Import/Export Living the Dream Miis!")
 
 mode_group = parser.add_mutually_exclusive_group(required=False)
 mode_group.add_argument("-l", action="store_true", help="List Miis")
@@ -410,7 +414,7 @@ def beginProcess():
 
 ##GUI Setup
 root = TkinterDnD.Tk()
-root.title("ShareMii")
+root.title("ShareMii v" + versionStr + " GUI")
 root.iconphoto(False, tk.PhotoImage(file=resourcePath("icon.png")))
 root.geometry("800x450")
 root.rowconfigure(6, weight=1)
