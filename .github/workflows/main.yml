@@ -14,8 +14,8 @@ jobs:
         with:
           python_ver: '3.14'
           pyinstaller_ver: '==6.19.0'
-          spec: 'src/ShareMii.py'
-          requirements: 'src/requirements.txt'
+          spec: 'ShareMii.py'
+          requirements: 'requirements.txt'
           upload_exe_with_name: 'windows'
           options: --onefile, --name "ShareMii", --windowed, --icon "icon.ico"
   pyinstaller-build-linux:
@@ -24,10 +24,10 @@ jobs:
       - name: Create Linux Executable
         uses: sayyid5416/pyinstaller@v1
         with:
-          python_ver: '3.6'
-          pyinstaller_ver: '==5.13.2'
-          spec: 'src/ShareMii.py'
-          requirements: 'src/requirements.txt'
+          python_ver: '3.14'
+          pyinstaller_ver: '==6.19.0'
+          spec: 'ShareMii.py'
+          requirements: 'requirements.txt'
           upload_exe_with_name: 'linux'
           options: --onefile, --name "ShareMii", --windowed, --icon "icon.ico"
   pyinstaller-build-macos:
@@ -36,9 +36,9 @@ jobs:
       - name: Create MacOS Executable
         uses: sayyid5416/pyinstaller@v1
         with:
-          python_ver: '3.6'
-          pyinstaller_ver: '==5.13.2'
-          spec: 'src/ShareMii.py'
-          requirements: 'src/requirements.txt'
+          python_ver: '3.14'
+          pyinstaller_ver: '==6.19.0'
+          spec: 'ShareMii.py'
+          requirements: 'requirements.txt'
           upload_exe_with_name: 'macos'
           options: --onefile, --name "ShareMii", --windowed, --icon "icon.ico"
