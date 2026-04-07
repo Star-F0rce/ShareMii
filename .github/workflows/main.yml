@@ -17,7 +17,7 @@ jobs:
           spec: 'ShareMii.py'
           requirements: 'requirements.txt'
           upload_exe_with_name: 'windows'
-          options: --onefile, --name "ShareMii", --windowed, --icon "icon.ico"
+          options: --onefile, --name "ShareMii", --add-data "icon.png", --windowed, --icon "icon.ico"
   pyinstaller-build-linux:
     runs-on: ubuntu-latest
     steps:
@@ -29,7 +29,7 @@ jobs:
           spec: 'ShareMii.py'
           requirements: 'requirements.txt'
           upload_exe_with_name: 'linux'
-          options: --onefile, --name "ShareMii", --windowed, --icon "icon.ico"
+          options: --onefile, --name "ShareMii", --add-data "icon.png", --windowed
   pyinstaller-build-macos:
     runs-on: macos-latest
     steps:
@@ -41,4 +41,4 @@ jobs:
           spec: 'ShareMii.py'
           requirements: 'requirements.txt'
           upload_exe_with_name: 'macos'
-          options: --onefile, --name "ShareMii", --windowed, --icon "icon.ico"
+          options: --onefile, --name "ShareMii", --add-data "icon.png", --windowed
