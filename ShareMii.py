@@ -3,7 +3,9 @@ import os
 import shutil
 import sys
 import tkinter as tk
-import re
+from tkinter import ttk
+import sv_ttk
+import darkdetect
 from pathlib import Path
 from tkinter import filedialog
 from tkinter.scrolledtext import ScrolledText
@@ -100,10 +102,10 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
     if args.l:
         args.slot = 1
 
-    if args.slot > 3:
-        raise RuntimeError("Invalid slot. Please choose a slot 0-3.")
+    if args.slot > 70:
+        raise RuntimeError("Invalid slot. Please choose a slot 0-70.")
     if args.slot < 0:
-        raise RuntimeError("Invalid slot. Please choose a slot 0-3.")
+        raise RuntimeError("Invalid slot. Please choose a slot 0-70.")
 
     args.slot -= 1
 
@@ -137,7 +139,7 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
 
     #Count Miis in-game
     numMii=list()
-    for x in range(70):
+    for x in range(69):
         if miisav[persOffsetP1+4*(x)] != 0:
             numMii.append(miisav[persOffsetP1+4*(x)])
     numMii = len(numMii)
@@ -149,7 +151,7 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
 
     ## LIST MODE ###################################################################
     if args.l:
-        for x in range(3):
+        for x in range(69):
             miiindex = miiOffset6 + ((numMii - 1) * 280) + 156 * (x)
             miilistname = miisav[miinames+((x)*64):miinames+((x)*64)+64]
             if sum(miisav[miiindex:miiindex+156]) != 152:
@@ -401,38 +403,47 @@ def beginProcess():
 root = TkinterDnD.Tk()
 root.title("ShareMii")
 root.iconphoto(False, tk.PhotoImage(file='icon.png'))
+root.geometry("800x450")
+root.rowconfigure(6, weight=1)
+root.columnconfigure(0, weight=1)
+root.columnconfigure(1, weight=1)
+root.columnconfigure(2, weight=1)
+root.resizable(True,True)
+style = ttk.Style(root)
 
-modeVar=tk.StringVar(value="Import")
+modeVar=tk.StringVar()
 slotVar=tk.StringVar(value="1")
 folderVar=tk.StringVar(value="Drag & drop or upload save folder here")
 fileVar=tk.StringVar(value="Drag & drop or choose Mii here")
 
-tk.Label(root, text="ShareMii GUI", font=(20)).grid(row=0, column=1, padx=5, pady=5)
+ttk.Label(root, text="ShareMii GUI", font=("",18,"bold")).grid(row=0, column=1, padx=5, pady=5)
 
-tk.Label(root, text="Select Save Folder:").grid(row=1, column=0, padx=5, pady=5)
-folderEntry = tk.Entry(root, textvariable=folderVar, width=50)
+ttk.Label(root, text="Select Save Folder:").grid(row=1, column=0, padx=5, pady=5, sticky=tk.E)
+folderEntry = ttk.Entry(root, textvariable=folderVar, width=50)
 folderEntry.drop_target_register(DND_FILES)
 folderEntry.dnd_bind('<<Drop>>',dragndrop)
-folderEntry.grid(row=1, column=1, padx=5, pady=5)
-browseButton = tk.Button(root, text="Browse...", width=12, command=browse_folder).grid(row=1, column=2, padx=3, pady=3)
+folderEntry.grid(row=1, column=1, padx=5, pady=5,sticky=tk.NSEW)
+browseButton = ttk.Button(root, text="Browse...", width=12, command=browse_folder).grid(row=1, column=2, padx=3, pady=3, sticky=tk.W)
 
-tk.Label(root, text="Open/Save As Mii:").grid(row=2, column=0, padx=5, pady=5)
-fileEntry = tk.Entry(root, textvariable=fileVar, width=50)
+ttk.Label(root, text="Open/Save As Mii:").grid(row=2, column=0, padx=5, pady=5, sticky=tk.E)
+fileEntry = ttk.Entry(root, textvariable=fileVar, width=50)
 fileEntry.drop_target_register(DND_FILES)
 fileEntry.dnd_bind('<<Drop>>',dragndrop)
-fileEntry.grid(row=2, column=1, padx=5, pady=5)
-browseButton = tk.Button(root, text="Browse...", width=12, command=browse_file).grid(row=2, column=2, padx=3, pady=3)
+fileEntry.grid(row=2, column=1, padx=5, pady=5,sticky=tk.NSEW)
+browseButton = ttk.Button(root, text="Browse...", width=12, command=browse_file).grid(row=2, column=2, padx=3, pady=3, sticky=tk.W)
 
-tk.Label(root, text="Select Slot:").grid(row=3, column=0, padx=5, pady=5)
-slotEntry = tk.Entry(root, textvariable=slotVar, width=5).grid(row=3, column=1, padx=5, pady=5, sticky=tk.W)
+ttk.Label(root, text="Select Slot:").grid(row=3, column=0, padx=5, pady=5, sticky=tk.E)
+slotEntry = ttk.Entry(root, textvariable=slotVar, width=5).grid(row=3, column=1, padx=5, pady=5, sticky=tk.W)
 
-tk.Label(root, text="Select Mode:").grid(row=4, column=0, padx=5, pady=5)
-modeEntry = tk.OptionMenu(root, modeVar, "Import", "Export", "List").grid(row=4, column=1, sticky=tk.W)
+ttk.Label(root, text="Select Mode:").grid(row=4, column=0, padx=5, pady=5, sticky=tk.E)
+modeEntry = ttk.OptionMenu(root, modeVar, "Import","Import", "Export", "List").grid(row=4, column=1, padx=5, pady=5, sticky=tk.W)
 
-startButton = tk.Button(root, text="Start!", command=beginProcess, width=20).grid(row=5, column=1, padx=5, pady=5)
+startButton = ttk.Button(root, text="Start!", command=beginProcess, width=20).grid(row=5, column=1, padx=5, pady=5)
 
-guiOutput = ScrolledText(root,height=10,width=40,font=("Courier", 8))
-guiOutput.grid(row=6, column=1)
+guiOutput = ScrolledText(root,height=10,width=40)
+guiOutput.grid(row=6, column=1,sticky=tk.NSEW)
+
+sv_ttk.set_theme(darkdetect.theme())
 
 ## CLI
 if args.l:
