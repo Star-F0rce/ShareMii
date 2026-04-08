@@ -469,7 +469,7 @@ browseButton = ttk.Button(root, text="Browse...", width=12, command=browseFile).
 
 ## Row 4
 ttk.Label(root, text="Select Slot:").grid(row=4, column=0, padx=5, pady=5, sticky=tk.E)
-slotEntry = ttk.Combobox(root, textvariable=slotVar)
+slotEntry = ttk.Combobox(root, textvariable=slotVar, state="readonly")
 slotEntry.grid(row=4, column=1, padx=5, pady=5, sticky=tk.W)
 slotEntry["values"]=list(range(0, 71))
 
