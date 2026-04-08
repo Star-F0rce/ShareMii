@@ -12,7 +12,7 @@ from tkinter.scrolledtext import ScrolledText
 from tkinterdnd2 import DND_FILES, TkinterDnD
 
 majVersion = 3
-minVersion = 0
+minVersion = 1
 versionStr = str(majVersion) + "." + str(minVersion)
 
 ## This is to output the command line to the GUI
