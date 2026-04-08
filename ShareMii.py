@@ -45,6 +45,8 @@ def browseFolder():
         folderVar.set(selectedDirectory)
         guiOutput.delete("1.0", "end")
         ShareMii("List", 1, selectedDirectory, "2")
+        getSlots(selectedDirectory)
+        slotEntry.current(0)
 
 ## Used to browse files in GUI
 def browseFile():
@@ -67,6 +69,8 @@ def dragndrop(event):
         folderVar.set(path)
         guiOutput.delete("1.0", "end")
         ShareMii("List", 1, path, "2")
+        getSlots(path)
+        slotEntry.current(0)
     else:
         fileVar.set(path)
 
@@ -388,6 +392,16 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
 
         output = bytearray([miiVersion]) + ltdData + miisav[miiindex:miiindex+156] + personality + name + pronounce + bytearray(sexuality) + section + canvastex + section + ugctex
 
+        printName = name[:name.find(bytes.fromhex("00 00 00"))]
+        if len(printName) % 2 == 1:
+            printName.append(0)
+
+        ## If user didn't give a name, we'll just set the name to their Mii name
+        if (args.o == "auto"):
+            args.o = printName.decode("utf-16")
+            if args.slot == -1:
+                args.o = "Mii"
+
         if ".ltd" not in args.o:
             args.o += ".ltd"
 
@@ -397,10 +411,6 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
         if args.slot == -1:
             name=bytearray.fromhex("54 00 65 00 6D 00 70")
 
-        printName = name[:name.find(bytes.fromhex("00 00 00"))]
-        if len(printName) % 2 == 1:
-            printName.append(0)
-
         print("Success! " + printName.decode("utf-16") + " written to " + args.o)
 
 def beginProcess():
@@ -408,9 +418,14 @@ def beginProcess():
     folder = folderVar.get()
     mode = modeVar.get()
     file = fileVar.get()
-    slot = int(slotVar.get())
+    slot = slotVar.get()
+    slot = int(slot[0])
+
+    if (file == "Drag & drop or choose Mii here") & (mode == "Export"):
+        file = "auto"
 
     ShareMii(mode, slot, folder, file)
+    getSlots(folder)
 
 ##GUI Setup
 root = TkinterDnD.Tk()
@@ -454,7 +469,9 @@ browseButton = ttk.Button(root, text="Browse...", width=12, command=browseFile).
 
 ## Row 4
 ttk.Label(root, text="Select Slot:").grid(row=4, column=0, padx=5, pady=5, sticky=tk.E)
-slotEntry = ttk.Entry(root, textvariable=slotVar, width=5).grid(row=4, column=1, padx=5, pady=5, sticky=tk.W)
+slotEntry = ttk.Combobox(root, textvariable=slotVar)
+slotEntry.grid(row=4, column=1, padx=5, pady=5, sticky=tk.W)
+slotEntry["values"]=list(range(0, 71))
 
 ## Row 5
 startButton = ttk.Button(root, text="Start!", command=beginProcess, width=20).grid(row=5, column=1, padx=5, pady=5)
@@ -464,6 +481,47 @@ guiOutput = ScrolledText(root,height=10,width=40)
 guiOutput.grid(row=6, column=1,sticky=tk.NSEW)
 
 sv_ttk.set_theme(darkdetect.theme())
+
+def updateSlots(options):
+    slotEntry["values"] = options
+
+filledSlots = ["0 - Temporary"]
+
+def getSlots(folder):
+
+    with open(folder + "/Mii.sav", "rb") as f:
+        miisav = bytearray(f.read())
+
+    with open(folder + "/Player.sav", "rb") as f:
+        playersav = bytearray(f.read())
+    
+    miiOffset3=399072
+    miiOffset4=int("289E84",16)
+    miiOffset6=int("1FE6E4",16) # Earliest offset for Mii data
+    persOffsetP1=int("F414",16) # Personality Values
+
+    if sum(playersav[miiOffset3:miiOffset3+156]) != 152:
+        filledSlots = ["0 - Temporary"]
+    else:
+        filledSlots = []
+
+    numMii=list()
+    for x in range(69):
+        if miisav[persOffsetP1+4*(x)] != 0:
+            numMii.append(miisav[persOffsetP1+4*(x)])
+    numMii = len(numMii)
+    
+    miinames = miiOffset4 + (numMii - 1) * 296
+
+    for x in range(69):
+        miiindex = miiOffset6 + ((numMii - 1) * 280) + 156 * (x)
+        miilistname = miisav[miinames+((x)*64):miinames+((x)*64)+64]
+        if sum(miisav[miiindex:miiindex+156]) != 152:
+            printName = miilistname[:miilistname.find(bytes.fromhex("00 00 00"))]
+            if len(printName) % 2 == 1:
+                printName.append(0)
+            filledSlots.append(str(x+1) + " - " + str(printName.decode("utf-16")))
+    updateSlots(filledSlots)
 
 ## Run script
 ## Using any args causes the CLI to activate, using none will start the GUI
