@@ -371,7 +371,7 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
                 facepaintFile = "00" + str(facepaintID)
             else:
                 facepaintFile = "0" + str(facepaintID)
-            print("Facepaint detected! Copying...")
+            print("Facepaint detected with ID " + str(facepaintID) +"! Grabbing..")
             # d_canvas = args.o + ".ltd.canvas.zs"
             # s_canvas = args.save + "/Ugc/UgcFacePaint" + facepaintFile + ".canvas.zs"
             # d_ugc = args.o + ".ltd.ugctex.zs"
@@ -431,7 +431,7 @@ def beginProcess():
 root = TkinterDnD.Tk()
 root.title("ShareMii v" + versionStr + " GUI")
 root.iconphoto(False, tk.PhotoImage(file=resourcePath("icon.png")))
-root.geometry("800x450")
+root.geometry("800x500")
 root.rowconfigure(6, weight=1)
 root.columnconfigure(0, weight=1)
 root.columnconfigure(1, weight=1)
@@ -445,7 +445,8 @@ folderVar=tk.StringVar(value="Drag & drop or upload save folder here")
 fileVar=tk.StringVar(value="Drag & drop or choose Mii here")
 
 ## Row 0
-ttk.Label(root, text="ShareMii", font=("",18,"bold")).grid(row=0, column=1, padx=5, pady=5)
+logo = tk.PhotoImage(file=resourcePath("logo.png"))
+ttk.Label(root, image=logo).grid(row=0, column=1, padx=5, pady=5)
 
 ## Row 1
 ttk.Label(root, text="Select Mode:").grid(row=1, column=0, padx=5, pady=5, sticky=tk.E)
