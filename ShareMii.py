@@ -135,14 +135,14 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
     #Ensure the slots match in-game
 
     # Offsets
-    fpOffset1=49612 # Facepaint Flags.. or something? They make facepaints work.
-    fpOffset2=285360
-    fpOffset3=288868
-    fpOffset4=406860
-    fpOffset5=409288
-    miiOffset1=70688 # Mii Sort IDs
-    miiOffset2=61348 # Mii Facepaint IDs
-    miiOffset3=399072 # Temp Slot Mii Offset
+    fpOffset1=int("C1CC",16) # Facepaint Flags.. or something? They make facepaints work.
+    fpOffset2=int("45AB0",16)
+    fpOffset3=int("46864",16)
+    fpOffset4=int("6354C",16)
+    fpOffset5=int("63EC8",16)
+    miiOffset1=int("11420",16) # Mii Sort IDs
+    miiOffset2=int("EFA4",16) # Mii Facepaint IDs
+    miiOffset3=int("616E0",16) # Temp Slot Mii Offset
     miiOffset4=int("289E84",16) # Earliest offset for names
     miiOffset5=int("2C7FAC",16) # Earliest offset for pronounce
     miiOffset6=int("1FE6E4",16) # Earliest offset for Mii data
