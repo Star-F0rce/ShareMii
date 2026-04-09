@@ -46,7 +46,7 @@ def browseFolder():
         guiOutput.delete("1.0", "end")
         ShareMii("List", 1, selectedDirectory, "2")
         getSlots(selectedDirectory)
-        slotEntry.current(0)
+        slotEntry.current(1)
 
 ## Used to browse files in GUI
 def browseFile():
@@ -70,7 +70,7 @@ def dragndrop(event):
         guiOutput.delete("1.0", "end")
         ShareMii("List", 1, path, "2")
         getSlots(path)
-        slotEntry.current(0)
+        slotEntry.current(1)
     else:
         fileVar.set(path)
 
@@ -449,7 +449,7 @@ ttk.Label(root, text="ShareMii", font=("",18,"bold")).grid(row=0, column=1, padx
 
 ## Row 1
 ttk.Label(root, text="Select Mode:").grid(row=1, column=0, padx=5, pady=5, sticky=tk.E)
-modeEntry = ttk.OptionMenu(root, modeVar, "Import","Import", "Export", "List").grid(row=1, column=1, padx=5, pady=5, sticky=tk.W)
+modeEntry = ttk.OptionMenu(root, modeVar,"Import","Import", "Export", "List").grid(row=1, column=1, padx=5, pady=5, sticky=tk.W)
 
 ## Row 2
 ttk.Label(root, text="Select Save Folder:").grid(row=2, column=0, padx=5, pady=5, sticky=tk.E)
@@ -485,8 +485,6 @@ sv_ttk.set_theme(darkdetect.theme())
 def updateSlots(options):
     slotEntry["values"] = options
 
-filledSlots = ["0 - Temporary"]
-
 def getSlots(folder):
 
     with open(folder + "/Mii.sav", "rb") as f:
@@ -501,9 +499,9 @@ def getSlots(folder):
     persOffsetP1=int("F414",16) # Personality Values
 
     if sum(playersav[miiOffset3:miiOffset3+156]) != 152:
-        filledSlots = ["0 - Temporary"]
+        filledSlots = ["0 - In-Progress Mii"]
     else:
-        filledSlots = []
+        filledSlots = ["0 - In-Progress Mii"] # Leaving this here in case I ever want to make it so it checks for temp slot being used.
 
     numMii=list()
     for x in range(69):
