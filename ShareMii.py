@@ -397,10 +397,10 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
             printName.append(0)
 
         ## If user didn't give a name, we'll just set the name to their Mii name
-        if (args.o == "auto"):
-            args.o = printName.decode("utf-16")
+        if (args.o[-4:] == "auto"):
+            args.o = args.o[:-4] + printName.decode("utf-16")
             if args.slot == -1:
-                args.o = "Mii"
+                args.o = args.o[:-4] + "Mii"
 
         if ".ltd" not in args.o:
             args.o += ".ltd"
@@ -423,6 +423,8 @@ def beginProcess():
 
     if (file == "Drag & drop or choose Mii here") & (mode == "Export"):
         file = "auto"
+    if (os.path.isdir(file)) & (mode == "Export"):
+        file = os.path.join(file,"auto")
 
     ShareMii(mode, slot, folder, file)
     getSlots(folder)
