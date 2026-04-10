@@ -54,6 +54,8 @@ def browseFile():
     # Opens folder selection dialog
     if modeVar.get() == "Import":
         selectedDirectory = filedialog.askopenfilename(defaultextension=".ltd", filetypes=[('LtD Mii Files', '*.ltd')])
+    if modeVar.get() == "Export All":
+        selectedDirectory = filedialog.askdirectory()
     else:
         selectedDirectory = filedialog.asksaveasfilename(defaultextension=".ltd", filetypes=[('LtD Mii Files', '*.ltd')])
     
