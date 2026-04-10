@@ -426,8 +426,20 @@ def beginProcess():
     if (os.path.isdir(file)) & (mode == "Export"):
         file = os.path.join(file,"auto")
 
-    ShareMii(mode, slot, folder, file)
-    getSlots(folder)
+    if mode != "Export All":
+        ShareMii(mode, slot, folder, file)
+        getSlots(folder)
+    else:
+        file = os.path.join(file,"auto")
+        mode = "Export"
+        names = slotEntry["values"]
+        names = names[1:]
+        for x in range(len(names)):
+            slot = names[x]
+            slot = int(slot[0])
+            ShareMii(mode, slot, folder, file)
+
+
 
 ##GUI Setup
 root = TkinterDnD.Tk()
@@ -452,7 +464,7 @@ ttk.Label(root, image=logo).grid(row=0, column=1, padx=5, pady=5)
 
 ## Row 1
 ttk.Label(root, text="Select Mode:").grid(row=1, column=0, padx=5, pady=5, sticky=tk.E)
-modeEntry = ttk.OptionMenu(root, modeVar,"Import","Import", "Export", "List").grid(row=1, column=1, padx=5, pady=5, sticky=tk.W)
+modeEntry = ttk.OptionMenu(root, modeVar,"Import","Import", "Export", "Export All", "List").grid(row=1, column=1, padx=5, pady=5, sticky=tk.W)
 
 ## Row 2
 ttk.Label(root, text="Select Save Folder:").grid(row=2, column=0, padx=5, pady=5, sticky=tk.E)
