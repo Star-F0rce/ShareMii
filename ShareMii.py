@@ -6,6 +6,7 @@ import tkinter as tk
 from tkinter import ttk
 import sv_ttk
 import darkdetect
+import re
 from pathlib import Path
 from tkinter import filedialog
 from tkinter.scrolledtext import ScrolledText
@@ -397,11 +398,15 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
         if len(printName) % 2 == 1:
             printName.append(0)
 
+        sanitName = printName.decode("utf-16")
+        sanitName = re.sub(r'[^\w.-]', '_', sanitName)
+
         ## If user didn't give a name, we'll just set the name to their Mii name
         if (args.o[-4:] == "auto"):
-            args.o = args.o[:-4] + printName.decode("utf-16")
             if args.slot == -1:
                 args.o = args.o[:-4] + "Mii"
+            else:
+                args.o = args.o[:-4] + sanitName
 
         if ".ltd" not in args.o:
             args.o += ".ltd"
