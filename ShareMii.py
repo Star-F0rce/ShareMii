@@ -470,7 +470,7 @@ ttk.Label(root, image=logo).grid(row=0, column=1, padx=5, pady=5)
 
 ## Row 1
 ttk.Label(root, text="Select Mode:").grid(row=1, column=0, padx=5, pady=5, sticky=tk.E)
-modeEntry = ttk.OptionMenu(root, modeVar,"Import","Import", "Export", "Export All", "List").grid(row=1, column=1, padx=5, pady=5, sticky=tk.W)
+modeEntry = ttk.OptionMenu(root, modeVar,"List","Import", "Export", "Export All", "List").grid(row=1, column=1, padx=5, pady=5, sticky=tk.W)
 
 ## Row 2
 ttk.Label(root, text="Select Save Folder:").grid(row=2, column=0, padx=5, pady=5, sticky=tk.E)
