@@ -438,6 +438,8 @@ def beginProcess():
         ShareMii(mode, slot, folder, file)
         getSlots(folder)
     else:
+        if not (os.path.isdir(file)):
+            raise RuntimeError(file + " is not a folder.")
         file = os.path.join(file,"auto")
         mode = "Export"
         names = slotEntry["values"]
