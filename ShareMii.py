@@ -95,6 +95,7 @@ mode_group = parser.add_mutually_exclusive_group(required=False)
 mode_group.add_argument("-l", action="store_true", help="List Miis")
 mode_group.add_argument("-i",metavar="Mii.ltd",type=str,help="Import Mii.ltd")
 mode_group.add_argument("-o",metavar="Name",type=str,help="Export Mii to Name.ltd")
+mode_group.add_argument("-a",metavar="Directory",type=str,help="Export all Miis to directory")
 parser.add_argument("save", type=str, help="save folder location", nargs="?")
 parser.add_argument("slot", type=int, help="Mii slot to import/export", nargs="?")
 
@@ -552,6 +553,17 @@ if args.o:
     modeVar = "Export"
     fileVar = args.o
     ShareMii(modeVar,args.slot,args.save,fileVar)
+    sys.exit(0)
+if args.a:
+    fileVar = os.path.join(args.a,"auto")
+    modeVar = "Export"
+    getSlots(args.save)
+    names = slotEntry["values"]
+    names = names[1:]
+    for x in range(len(names)):
+            slot = names[x]
+            slot = int(slot[0])
+            ShareMii(modeVar,slot,args.save,fileVar)
     sys.exit(0)
 else:
     sys.stdout = TextRedirector(guiOutput)
