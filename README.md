@@ -9,3 +9,9 @@ To use the CLI, run in your terminal: ShareMii [-h] [-l | -i Mii.ltd | -o Name] 
 -l: List Mode, Lists every Mii found in [save]\
 -i: Import Mode, Imports Mii.ltd into [save], overwriting [slot]\
 -o: Export Mode, Exports Mii from [save] at [slot], into Name.ltd\
+
+## Building
+Executables are built with PyInstaller. To build one, clone the repository and run\
+pip install pyinstaller\
+pip install -r requirements.txt\
+py -m PyInstaller --onefile --name "ShareMii" --icon "icon.ico" --add-data "icon.png:." --add-data "logo.png:." --windowed ShareMii.py
