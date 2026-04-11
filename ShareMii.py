@@ -7,6 +7,7 @@ from tkinter import ttk
 import sv_ttk
 import darkdetect
 import re
+import struct
 from pathlib import Path
 from tkinter import filedialog
 from tkinter.scrolledtext import ScrolledText
@@ -77,6 +78,18 @@ def dragndrop(event):
     else:
         fileVar.set(path)
 
+def offsetLocator(file, hashStr):
+    hash = bytes.fromhex(hashStr)
+    littleHash = hash[::-1]
+
+    index = file.find(littleHash)
+    if index == -1:
+        return None
+    offsetBytes = file[index + 4:index + 8]
+    offset = struct.unpack('<I', offsetBytes)[0]
+    
+    return offset
+
 ## Handles the sexuality bytes
 def DecodeSexuality(data: bytearray) -> list[int]:
     return [int(bit) for byte in data for bit in f"{byte:08b}"[::-1]]
@@ -136,6 +149,9 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
     with open(args.save + "/Player.sav", "rb") as f:
         playersav = bytearray(f.read())
 
+    miiLocation = args.save + "/Mii.sav"
+    playerLocation = args.save + "/Player.sav"
+
     #Ensure the slots match in-game
 
     # Offsets
@@ -147,9 +163,9 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
     miiOffset1=int("11420",16) # Mii Sort IDs
     miiOffset2=int("EFA4",16) # Mii Facepaint IDs
     miiOffset3=int("616E0",16) # Temp Slot Mii Offset
-    miiOffset4=int("289E84",16) # Earliest offset for names
-    miiOffset5=int("2C7FAC",16) # Earliest offset for pronounce
-    miiOffset6=int("1FE6E4",16) # Earliest offset for Mii data
+    miiOffset4=offsetLocator(miisav,"2499BFDA") + 4
+    miiOffset5=offsetLocator(miisav,"3A5EDA05") + 4
+    miiOffset6=offsetLocator(miisav,"881CA27A") + 4
     persOffsetP1=int("F414",16) # Personality Values
     persOffsetSX=int("23AC",16) # x27
     persOffsets=list([int("F414",16),int("FF1C",16),int("107F8",16),int("10A30",16),int("10B4C",16),int("5F8C",16),int("96E0",16),int("F0C0",16),int("F2F8",16),int("FCE4",16),int("329D4",16),int("1A7B8",16),int("15008",16),int("271C0",16),int("5B1C",16),int("5D54",16),int("5E70",16),int("11890",16)])
@@ -158,22 +174,15 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
     #     if miisav[miiOffset1+4*(args.slot)] != (args.slot):
     #         args.slot = int(miisav[miiOffset1+4*(args.slot)])
 
-    #Count Miis in-game
-    numMii=list()
-    for x in range(69):
-        if miisav[persOffsetP1+4*(x)] != 0:
-            numMii.append(miisav[persOffsetP1+4*(x)])
-    numMii = len(numMii)
-
     # Searchable Offsets
-    miiindex = miiOffset6 + ((numMii - 1) * 280) + 156 * (args.slot)
-    miinames = miiOffset4 + (numMii - 1) * 296
-    miiprefer = miiOffset5 + (numMii - 1) * 296
+    miiindex = miiOffset6 + 156 * (args.slot)
+    miinames = miiOffset4
+    miiprefer = miiOffset5
 
     ## LIST MODE ###################################################################
     if args.l:
         for x in range(69):
-            miiindex = miiOffset6 + ((numMii - 1) * 280) + 156 * (x)
+            miiindex = miiOffset6 + 156 * (x)
             miilistname = miisav[miinames+((x)*64):miinames+((x)*64)+64]
             if sum(miisav[miiindex:miiindex+156]) != 152:
                 printName = miilistname[:miilistname.find(bytes.fromhex("00 00 00"))]
@@ -512,6 +521,9 @@ def updateSlots(options):
 
 def getSlots(folder):
 
+    miiLocation = folder + "/Mii.sav"
+    playerLocation = folder + "/Player.sav"
+
     with open(folder + "/Mii.sav", "rb") as f:
         miisav = bytearray(f.read())
 
@@ -519,25 +531,19 @@ def getSlots(folder):
         playersav = bytearray(f.read())
     
     miiOffset3=399072
-    miiOffset4=int("289E84",16)
-    miiOffset6=int("1FE6E4",16) # Earliest offset for Mii data
+    miiOffset4=offsetLocator(miisav,"2499BFDA") + 4
+    miiOffset6=offsetLocator(miisav,"881CA27A") + 4 # Earliest offset for Mii data
     persOffsetP1=int("F414",16) # Personality Values
 
     if sum(playersav[miiOffset3:miiOffset3+156]) != 152:
         filledSlots = ["0 - In-Progress Mii"]
     else:
         filledSlots = ["0 - In-Progress Mii"] # Leaving this here in case I ever want to make it so it checks for temp slot being used.
-
-    numMii=list()
-    for x in range(69):
-        if miisav[persOffsetP1+4*(x)] != 0:
-            numMii.append(miisav[persOffsetP1+4*(x)])
-    numMii = len(numMii)
     
-    miinames = miiOffset4 + (numMii - 1) * 296
+    miinames = miiOffset4
 
     for x in range(69):
-        miiindex = miiOffset6 + ((numMii - 1) * 280) + 156 * (x)
+        miiindex = miiOffset6 + 156 * (x)
         miilistname = miisav[miinames+((x)*64):miinames+((x)*64)+64]
         if sum(miisav[miiindex:miiindex+156]) != 152:
             printName = miilistname[:miilistname.find(bytes.fromhex("00 00 00"))]
