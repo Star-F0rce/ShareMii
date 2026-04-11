@@ -155,24 +155,37 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
     #Ensure the slots match in-game
 
     # Offsets
-    fpOffset1=int("C1CC",16) # Facepaint Flags.. or something? They make facepaints work.
-    fpOffset2=int("45AB0",16)
-    fpOffset3=int("46864",16)
-    fpOffset4=int("6354C",16)
-    fpOffset5=int("63EC8",16)
+    fpOffset1=offsetLocator(playersav,"4C9819E4") + 4 # UGC.Facepaint.Price
+    fpOffset2=offsetLocator(playersav,"DECC8954") + 4 # UGC.Facepaint.TextureSourceType
+    fpOffset3=offsetLocator(playersav,"23135BC5") + 4 # UGC.Facepaint.State
+    fpOffset4=offsetLocator(playersav,"FFC750B6") + 4 # UGC.Facepaint.Unknown
+    fpOffset5=offsetLocator(playersav,"A56E42EC") + 4 # UGC.Facepaint.Hash
     miiOffset1=int("11420",16) # Mii Sort IDs
-    miiOffset2=int("EFA4",16) # Mii Facepaint IDs
+    miiOffset2=offsetLocator(miisav,"5E32ADF4") + 4 # Mii.MiiMisc.FaceInfo.FacePaintIndex
     miiOffset3=int("616E0",16) # Temp Slot Mii Offset
-    miiOffset4=offsetLocator(miisav,"2499BFDA") + 4
-    miiOffset5=offsetLocator(miisav,"3A5EDA05") + 4
-    miiOffset6=offsetLocator(miisav,"881CA27A") + 4
-    persOffsetP1=int("F414",16) # Personality Values
-    persOffsetSX=int("23AC",16) # x27
-    persOffsets=list([int("F414",16),int("FF1C",16),int("107F8",16),int("10A30",16),int("10B4C",16),int("5F8C",16),int("96E0",16),int("F0C0",16),int("F2F8",16),int("FCE4",16),int("329D4",16),int("1A7B8",16),int("15008",16),int("271C0",16),int("5B1C",16),int("5D54",16),int("5E70",16),int("11890",16)])
-    #Check to see if the slot the user desires matches the one in game. If not, pivot to that one
-    # if (args.slot != -1) & (miisav[miiOffset1+4*(args.slot)] != 255):
-    #     if miisav[miiOffset1+4*(args.slot)] != (args.slot):
-    #         args.slot = int(miisav[miiOffset1+4*(args.slot)])
+    miiOffset4=offsetLocator(miisav,"2499BFDA") + 4 # Mii Names
+    miiOffset5=offsetLocator(miisav,"3A5EDA05") + 4 # Pronounciation
+    miiOffset6=offsetLocator(miisav,"881CA27A") + 4 # Raw Mii data
+    persOffsetP1=offsetLocator(miisav,"43CD364F") + 4 # Mii.CharacterParam.Sociability
+    persOffsetP2=offsetLocator(miisav,"CD8DBAF8") + 4 # Mii.CharacterParam.Audaciousness
+    persOffsetP3=offsetLocator(miisav,"25B48224") + 4 # Mii.CharacterParam.Activeness
+    persOffsetP4=offsetLocator(miisav,"607BA160") + 4 # Mii.CharacterParam.Commonsense
+    persOffsetP5=offsetLocator(miisav,"607BA160") + 4 # Mii.CharacterParam.Gaiety
+    persOffsetV1=offsetLocator(miisav,"4913AE1A") + 4 # Mii.Voice.Formant
+    persOffsetV2=offsetLocator(miisav,"141EE086") + 4 # Mii.Voice.Speed
+    persOffsetV3=offsetLocator(miisav,"07B9D175") + 4 # Mii.Voice.Intonation
+    persOffsetV4=offsetLocator(miisav,"81CF470A") + 4 # Mii.Voice.Pitch
+    persOffsetV5=offsetLocator(miisav,"4D78E262") + 4 # Mii.Voice.Tension
+    persOffsetV6=offsetLocator(miisav,"FBC3FFB0") + 4 # Mii.Voice.PresetType
+    persOffsetS1=offsetLocator(miisav,"236E2D73") + 4 # Mii.MiiMisc.FaceInfo.Gender
+    persOffsetS2=offsetLocator(miisav,"F3C3DE59") + 4 # Mii.Name.PronounType
+    persOffsetS3=offsetLocator(miisav,"660C5247") + 4 # Mii.MiiMisc.ClothInfo.ClothStyle
+    persOffsetB1=offsetLocator(miisav,"5D7D3F45") + 4 # Mii.MiiMisc.BirthdayInfo.Year
+    persOffsetB2=offsetLocator(miisav,"AB8AE08B") + 4 # Mii.MiiMisc.BirthdayInfo.Day
+    persOffsetB3=offsetLocator(miisav,"2545E583") + 4 # Mii.MiiMisc.BirthdayInfo.DirectAge
+    persOffsetB4=offsetLocator(miisav,"6CF484F4") + 4 # Mii.MiiMisc.BirthdayInfo.Month
+    persOffsetSX=offsetLocator(miisav,"DFC82223") + 4 # Mii.MiiMisc.FaceInfo.IsLoveGender
+    persOffsets=list([persOffsetP1,persOffsetP2,persOffsetP3,persOffsetP4,persOffsetP5,persOffsetV1,persOffsetV2,persOffsetV3,persOffsetV4,persOffsetV5,persOffsetV6,persOffsetS1,persOffsetS2,persOffsetS3,persOffsetB1,persOffsetB2,persOffsetB3,persOffsetB4])
 
     # Searchable Offsets
     miiindex = miiOffset6 + 156 * (args.slot)
