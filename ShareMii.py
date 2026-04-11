@@ -318,7 +318,7 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
             print("No personal data configured, skipping...")
 
         if (mii[0] == 2) & (args.slot != -1):
-            print("Personality detected! Applying...")
+            print("Personal data detected! Applying...")
             # Apply personality changes
             for x in range(18):
                 miisav[persOffsets[x]+(args.slot)*4:persOffsets[x]+(args.slot)*4+4] = mii[161+x*4:161+x*4+4]
@@ -331,7 +331,7 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
             sexuality[(args.slot)*3:(args.slot)*3+3]=miisexuality
             sexuality = EncodeSexuality(sexuality)
             miisav[persOffsetSX:persOffsetSX+27] = sexuality
-            print("Personality done!")
+            print("Personal data replaced!")
 
         with open(args.save + "/Mii.sav", "wb") as f:
             f.write(miisav)
