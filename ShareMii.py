@@ -196,22 +196,33 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
         with open(miipath, "rb") as f:
             mii = bytearray(f.read())
 
+        ## CONVERSION
+        # ltdv3 changed certain parts of the file to be more consistent. This check will convert old Miis into ones that work
+        if mii[0] < 3:
+            del mii[4]
+            if mii[0] == 2:
+                mii = mii[:427] + bytearray([0]) + mii[427:]
+                canvasStart = mii.find(bytes.fromhex("A3 A3 A3")) + 3
+                ugcStart = mii.rfind(bytes.fromhex("A3 A3 A3"))
+                mii = mii[:canvasStart] + bytearray([163]) + mii[canvasStart:]
+                mii[ugcStart+1:ugcStart+4] = bytearray.fromhex("A4 A4 A4")
+                mii = mii[:ugcStart + 3] + bytearray([164]) + mii[ugcStart + 3:]
+
         #Find where miis are stored in Mii.sav
         paintindex = fpOffset3 + 4 * (slot)
-        canvasStart = mii.find(bytes.fromhex("A3 A3 A3")) + 3
-        ugcStart = mii.rfind(bytes.fromhex("A3 A3 A3")) + 3
+        canvasStart = mii.find(bytes.fromhex("A3 A3 A3 A3")) + 4
+        ugcStart = mii.rfind(bytes.fromhex("A4 A4 A4 A4")) + 4
         facepaint = 0
-        # AFAIK, with Player.sav, everything is static so we can just use those here
         if slot == -1:
             paintindex = fpOffset3 + 4 * 70
             miiindex = miiOffset3
         
         if mii[1:3] == bytearray.fromhex('01 01'):
             facepaint = 1
-            mii[48] = 1
+            mii[47] = 1
         if os.path.isfile(miipath + ".canvas.zs") & os.path.isfile(miipath + ".ugctex.zs"):
             facepaint = 2
-            mii[48] = 1
+            mii[47] = 1
 
         #Errors
         if sum(miisav[miiindex:miiindex+156]) == 152:
@@ -220,10 +231,10 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
         #Write to file
         if slot == -1:
             print("Writing Mii to the temporary slot...")
-            playersav[miiindex:miiindex+156] = mii[5:5+156]
+            playersav[miiindex:miiindex+156] = mii[4:4+156]
         else:
             print(f"Mii detected at {hex(miiindex)}! Replacing...")
-            miisav[miiindex:miiindex+156] = mii[5:5+156]
+            miisav[miiindex:miiindex+156] = mii[4:4+156]
 
         ## FACEPAINT ##
 
@@ -235,18 +246,15 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
             print("Facepaint detected! Copying...")
             #If we're replacing a mii that didn't initially have facepaint, we'll give it the next ID facepaint
             if facepaintID == 255:
-                usedIDs=bytearray(70)
+                usedIDs=bytearray([255] * 70)
                 for x in range(70):
                     if miisav[miiOffset2+4*(x)] != 255:
                         usedIDs[x]=miisav[miiOffset2+4*(x)]
                 s = set(usedIDs)
-                if s == {0}:
-                    facepaintID = 0
-                else:
-                    for i in range(70):
-                        if i not in s:
-                            facepaintID=i
-                            break
+                for i in range(70):
+                    if i not in s:
+                        facepaintID=i
+                        break
 
             #The fun part! Telling the game to read the facepaint files.
             if slot == -1:
@@ -282,7 +290,7 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
                 shutil.copy(s_ugc, d_ugc)
             else:
                 with open(save + "/Ugc/UgcFacePaint" + facepaintFile + ".canvas.zs", "wb") as f:
-                    f.write(mii[canvasStart:ugcStart - 3])
+                    f.write(mii[canvasStart:ugcStart - 4])
                 with open(save + "/Ugc/UgcFacePaint" + facepaintFile + ".ugctex.zs", "wb") as f:
                     f.write(mii[ugcStart:])
             print("Facepaint successfully copied.")
@@ -300,18 +308,18 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
 
         ## FACEPAINT END ##
         ## PERSONALITY ##
-        if (mii[0] != 2) & (slot != -1):
+        if (mii[0] < 2) & (slot != -1):
             print("No personal data configured, skipping...")
 
-        if (mii[0] == 2) & (slot != -1):
+        if (mii[0] >= 2) & (slot != -1):
             print("Personal data detected! Applying...")
             # Apply personality changes
             for x in range(18):
-                miisav[persOffsets[x]+(slot)*4:persOffsets[x]+(slot)*4+4] = mii[161+x*4:161+x*4+4]
+                miisav[persOffsets[x]+(slot)*4:persOffsets[x]+(slot)*4+4] = mii[160+x*4:160+x*4+4]
 
-            miisav[miinames+((slot)*64):miinames+((slot)*64)+64] = mii[233:297]
-            miisav[miiprefer+((slot)*128):miiprefer+((slot)*128)+128] = mii[297:425]
-            miisexuality=list(mii[425:428])
+            miisav[miinames+((slot)*64):miinames+((slot)*64)+64] = mii[232:296]
+            miisav[miiprefer+((slot)*128):miiprefer+((slot)*128)+128] = mii[296:424]
+            miisexuality=list(mii[424:427])
             sexuality = miisav[persOffsetSX:persOffsetSX+27]
             sexuality = DecodeSexuality(sexuality)
             sexuality[(slot)*3:(slot)*3+3]=miisexuality
@@ -366,17 +374,18 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
         sexuality = miisav[persOffsetSX:persOffsetSX+27]
         sexuality = DecodeSexuality(sexuality)
         sexuality=sexuality[(slot)*3:(slot)*3+3]
+        sexuality.append(0)
         
         name = miisav[miinames+((slot)*64):miinames+((slot)*64)+64]
         pronounce = miisav[miiprefer+((slot)*128):miiprefer+((slot)*128)+128]
-        section = bytearray.fromhex('A3 A3 A3')
-
+        canvasSection = bytearray.fromhex('A3 A3 A3 A3')
+        ugcSection = bytearray.fromhex('A4 A4 A4 A4')
         #Actually create the Mii file
         if slot == -1:
             miiVersion = 1
         else:
-            miiVersion = 2
-        ltdData = bytearray(4)
+            miiVersion = 3
+        ltdData = bytearray(3)
         #If facepaint is detected, copy and rename them
         if facepaint:
             if facepaintID < 10:
@@ -402,7 +411,7 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
             canvastex=bytearray()
             ugctex=bytearray()
 
-        output = bytearray([miiVersion]) + ltdData + miisav[miiindex:miiindex+156] + personality + name + pronounce + bytearray(sexuality) + section + canvastex + section + ugctex
+        output = bytearray([miiVersion]) + ltdData + miisav[miiindex:miiindex+156] + personality + name + pronounce + bytearray(sexuality) + canvasSection + canvastex + ugcSection + ugctex
 
         printName = name[:name.find(bytes.fromhex("00 00 00"))]
         if len(printName) % 2 == 1:
