@@ -1,5 +1,5 @@
 # ShareMii
-A GUI/CLI Tool written in Python to export and import Miis from Tomodachi Life: Living the Dream - Welcome Edition save files.
+A GUI/CLI Tool written in Python to export and import Miis from Tomodachi Life: Living the Dream - Welcome Edition save files./
 <img width="401" height="241" alt="Screenshot" src="https://github.com/user-attachments/assets/176f5da1-f3ae-492b-aebd-761d54486574" />
 ## Usage
 To start the GUI, run ShareMii with no arguments
