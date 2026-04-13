@@ -293,7 +293,7 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
                     f.write(mii[canvasStart:ugcStart - 4])
                 with open(save + "/Ugc/UgcFacePaint" + facepaintFile + ".ugctex.zs", "wb") as f:
                     f.write(mii[ugcStart:])
-            print("Facepaint successfully copied.")
+            print("Facepaint successfully copied to " + save + "/Ugc/UgcFacePaint" + facepaintFile)
 
         #If the imported Mii doesn't have facepaint, we should remove the old one
         else:
