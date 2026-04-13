@@ -148,7 +148,7 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
     fpOffset5=offsetLocator(playersav,"A56E42EC") + 4 # UGC.Facepaint.Hash
     miiOffset1=int("11420",16) # Mii Sort IDs
     miiOffset2=offsetLocator(miisav,"5E32ADF4") + 4 # Mii.MiiMisc.FaceInfo.FacePaintIndex
-    miiOffset3=int("616E0",16) # Temp Slot Mii Offset
+    miiOffset3=offsetLocator(playersav,"114EFF89") # Temp Slot Mii Offset
     miiOffset4=offsetLocator(miisav,"2499BFDA") + 4 # Mii Names
     miiOffset5=offsetLocator(miisav,"3A5EDA05") + 4 # Pronounciation
     miiOffset6=offsetLocator(miisav,"881CA27A") + 4 # Raw Mii data
