@@ -445,7 +445,7 @@ def beginProcess():
     mode = modeVar.get()
     file = fileVar.get()
     slot = slotVar.get()
-    slot = int(slot[0])
+    slot = int(slot.split(" - ")[0])
 
     if (file == "Drag & drop or choose Mii here") & (mode == "Export"):
         file = "auto"
@@ -464,7 +464,7 @@ def beginProcess():
         names = names[1:]
         for x in range(len(names)):
             slot = names[x]
-            slot = int(slot[0])
+            slot = int(slot.split(" - ")[0])
             ShareMii(mode, slot, folder, file)
 
 
@@ -586,7 +586,7 @@ if args.a:
     names = names[1:]
     for x in range(len(names)):
             slot = names[x]
-            slot = int(slot[0])
+            slot = int(slot.split(" - ")[0])
             ShareMii(modeVar,slot,args.save,fileVar)
     sys.exit(0)
 else:
