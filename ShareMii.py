@@ -57,9 +57,10 @@ def browseFile():
         selectedDirectory = filedialog.askopenfilename(defaultextension=".ltd", filetypes=[('LtD Mii Files', '*.ltd')])
     if modeVar.get() == "Export All":
         selectedDirectory = filedialog.askdirectory()
-    else:
+    if modeVar.get() == "Export":
         selectedDirectory = filedialog.asksaveasfilename(defaultextension=".ltd", filetypes=[('LtD Mii Files', '*.ltd')])
-    
+    if modeVar.get() == "List":
+        selectedDirectory = filedialog.askdirectory()
     if selectedDirectory:
         fileVar.set(selectedDirectory)
 
