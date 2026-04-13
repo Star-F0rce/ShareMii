@@ -15,7 +15,9 @@ from tkinterdnd2 import DND_FILES, TkinterDnD
 
 majVersion = 3
 minVersion = 1
-versionStr = str(majVersion) + "." + str(minVersion)
+preVersion = 2
+
+versionStr = str(majVersion) + "." + str(minVersion) + preVersion
 
 ## This is to output the command line to the GUI
 class TextRedirector():
