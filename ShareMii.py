@@ -16,7 +16,8 @@ from tkinterdnd2 import DND_FILES, TkinterDnD
 majVersion = 3
 minVersion = 1
 preVersion = 2
-
+if preVersion:
+    preVersion = str(".pre" + str(preVersion))
 versionStr = str(majVersion) + "." + str(minVersion) + preVersion
 
 ## This is to output the command line to the GUI
