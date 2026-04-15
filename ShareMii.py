@@ -211,9 +211,9 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
             mii = bytearray(f.read())
 
         if mii == bytearray():
-            raise RuntimeError("This Mii is empty!")
+            raise RuntimeError("This Mii is empty!") # Did you try looking under the tray?
         if mii[0] not in range(1,3):
-            raise RuntimeError(".ltd not recognized. Is this really a Mii?")
+            raise RuntimeError("Incorrect version found. Expected 1-3, got" + str(mii[0]))
 
         ## CONVERSION
         # ltdv3 changed certain parts of the file to be more consistent. This check will convert old Miis into ones that work
@@ -466,8 +466,14 @@ def beginProcess():
     mode = modeVar.get()
     file = fileVar.get()
     slot = slotVar.get()
-    slot = int(slot.split(" - ")[0])
     item = itemVar.get()
+
+    isAdding = False
+    if slot.split(" - ")[1] == "Add New Item":
+        isAdding = True
+    slot = int(slot.split(" - ")[0])
+    if (mode != "Import") & (isAdding == True):
+        raise RuntimeError("You can't use this slot with this mode.")
 
     if (file == "Drag & drop or choose Mii here") & (mode == "Export"):
         file = "auto"
@@ -478,9 +484,9 @@ def beginProcess():
         if item == "Mii":
             ShareMii(mode, slot, folder, file)
         if item == "Food":
-            ShareFood(mode, slot, folder, file)
+            ShareFood(mode, slot, folder, file, isAdding)
         if item == "Clothing":
-            ShareCloth(mode, slot, folder, file)
+            ShareCloth(mode, slot, folder, file, isAdding)
         getSlots(folder)
     else:
         if not (os.path.isdir(file)):
@@ -495,9 +501,9 @@ def beginProcess():
         if item == "Mii":
             ShareMii(mode, slot, folder, file)
         if item == "Food":
-            ShareFood(mode, slot, folder, file)
+            ShareFood(mode, slot, folder, file, isAdding)
         if item == "Clothing":
-            ShareCloth(mode, slot, folder, file)
+            ShareCloth(mode, slot, folder, file, isAdding)
 
 ##GUI Setup
 root = TkinterDnD.Tk()
@@ -600,6 +606,7 @@ def getSlots(folder):
         nOffset1=offsetLocator(playersav,"40710642") + 4
         filledSlots = []
     if item != "Mii":
+        New = False
         for x in range(maxSlots):
             if x < 10:
                 ugcFile = "/Ugc"+ ugcType + "00" + str(x) + ".canvas.zs"
@@ -611,6 +618,9 @@ def getSlots(folder):
                 if len(ugcPrintName) % 2 == 1:
                     ugcPrintName.append(0)
                 filledSlots.append(str(x+1) + " - " + ugcPrintName.decode("utf-16"))
+            if (not os.path.isfile(folder + "/Ugc" + ugcFile)) & (New == False):
+                filledSlots.append(str(x+1) + " - Add New Item")
+                New = True
     updateSlots(filledSlots)
 
 itemVar.trace_add(

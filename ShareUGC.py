@@ -18,7 +18,7 @@ def offsetLocator(file, hashStr):
 ugcTypeString = list(["Food","Clothing"])
 ugcTypeIndex = list(["Food","Cloth"])
 
-def ShareFood(mode: str, slot: int, save: str, ugcpath:str):
+def ShareFood(mode: str, slot: int, save: str, ugcpath:str, isAdding:bool):
 
     ugcKind=0
 
@@ -47,11 +47,12 @@ def ShareFood(mode: str, slot: int, save: str, ugcpath:str):
     nOffset1=offsetLocator(playersav,"408494F5") + 4 # UGC.Food.Name
     nOffset2=offsetLocator(playersav,"BA0F4BAF") + 4 # UGC.Food.HowToCallName
     ugcOffsets=list([fOffset1,fOffset2,fOffset3,fOffset4,fOffset5,fOffset6,fOffset7,fOffset8,fOffset9,fOffset10])
+    EOffset=offsetLocator(playersav,"307FEEFA")
     nOffsets=list([nOffset1,nOffset2])
-    shareUGC(mode, slot, save, ugcpath, ugcKind, ugcOffsets,nOffsets)
+    shareUGC(mode, slot, save, ugcpath, ugcKind, ugcOffsets,nOffsets, isAdding)
     return()
 
-def ShareCloth(mode: str, slot: int, save: str, ugcpath:str):
+def ShareCloth(mode: str, slot: int, save: str, ugcpath:str, isAdding:bool):
 
     ugcKind=1
 
@@ -81,13 +82,25 @@ def ShareCloth(mode: str, slot: int, save: str, ugcpath:str):
     nOffset2=offsetLocator(playersav,"CF9A13EA") + 4 # UGC.Cloth.HowToCallName
     ugcOffsets=list([fOffset1,fOffset2,fOffset3,fOffset4,lOffset1,lOffset2,lOffset3,lOffset4,lOffset5,lOffset6])
     nOffsets=list([nOffset1,nOffset2])
-    shareUGC(mode, slot, save, ugcpath, ugcKind, ugcOffsets,nOffsets)
+    shareUGC(mode, slot, save, ugcpath, ugcKind, ugcOffsets,nOffsets, isAdding)
     return()
 
-def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffsets:list, nOffsets:list):
+def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffsets:list, nOffsets:list, isAdding:bool):
     ugcType= ugcTypeIndex[ugcKind]
     with open(save + "/Player.sav", "rb") as f:
         playersav = bytearray(f.read())
+
+    EOffset1=offsetLocator(playersav,"F4A39965") + 4 # Food
+    EOffset2=offsetLocator(playersav,"AF129C33") + 4# Cloth
+    ugcEnableOffsets= list([EOffset1,EOffset2])
+    TOffset1=offsetLocator(playersav,"3558B77F") + 4# Food
+    TOffset2=offsetLocator(playersav,"59BFA9D3") + 4# Cloth
+    ugcTexOffsets = list([TOffset1,TOffset2])
+    HOffset1=offsetLocator(playersav,"6D48F8E2") + 4# Food
+    HOffset2=offsetLocator(playersav,"89F25CAC") + 4# Cloth
+    ugcHashOffsets = list([HOffset1,HOffset2])
+    ugcHashIndex = list([1,3])
+
     ## LIST MODE ###################################################################
     if mode == "List":
         for x in range(99):
@@ -128,7 +141,7 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
             f.write(ugc[ugcStart:thumbStart - 4])
         with open(save + "/Ugc/Ugc" + ugcFile + "_Thumb.ugctex.zs", "wb") as f:
             f.write(ugc[thumbStart:])
-        print("UGC successfully copied to " + save + "/Ugc/UgcFood" + ugcFile)
+        print("UGC successfully copied to " + save + "/Ugc/Ugc" + ugcFile)
 
         ## TEXTURES END ##
 
@@ -138,6 +151,10 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
         for x in range(len(ugcOffsets)):
             playersav[ugcOffsets[x]+(slot)*4:ugcOffsets[x]+(slot)*4+4] = ugc[4+x*4:4+x*4+4]
 
+        if isAdding:
+            playersav[ugcEnableOffsets[ugcKind]+(slot)*4:ugcEnableOffsets[ugcKind]+(slot)*4+4] = bytearray.fromhex("F4 AD 7F 1D")
+            playersav[ugcTexOffsets[ugcKind]+(slot)*4:ugcTexOffsets[ugcKind]+(slot)*4+4] = bytearray.fromhex("41 49 93 56")
+            playersav[ugcHashOffsets[ugcKind]+(slot)*4:ugcHashOffsets[ugcKind]+(slot)*4+4] = bytearray([slot, 0, int(ugcHashIndex[ugcKind]), 0])
 
         playersav[nOffsets[0]+((slot)*128):nOffsets[0]+((slot)*128)+128] = ugc[nameStart:nameStart+128]
         playersav[nOffsets[1]+((slot)*128):nOffsets[1]+((slot)*128)+128] = ugc[nameStart+128:nameStart+(128*2)]
