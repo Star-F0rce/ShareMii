@@ -12,12 +12,15 @@ from pathlib import Path
 from tkinter import filedialog
 from tkinter.scrolledtext import ScrolledText
 from tkinterdnd2 import DND_FILES, TkinterDnD
+from ShareUGC import ShareCloth,ShareFood,shareUGC
 
 majVersion = 3
-minVersion = 1
-preVersion = ""
+minVersion = 2
+preVersion = 0
 if preVersion:
     preVersion = str(".pre" + str(preVersion))
+else:
+    preVersion = ""
 versionStr = str(majVersion) + "." + str(minVersion) + preVersion
 
 ## This is to output the command line to the GUI
@@ -56,11 +59,17 @@ def browseFolder():
 def browseFile():
     # Opens folder selection dialog
     if modeVar.get() == "Import":
-        selectedDirectory = filedialog.askopenfilename(defaultextension=".ltd", filetypes=[('LtD Mii Files', '*.ltd')])
+        if itemVar.get() == "Mii":
+            selectedDirectory = filedialog.askopenfilename(defaultextension=".ltd", filetypes=[('LtD Mii Files', '*.ltd')])
+        else:
+            selectedDirectory = filedialog.askopenfilename(defaultextension=".ltd", filetypes=[('LtD Custom Files', '*.ltdc')])
     if modeVar.get() == "Export All":
         selectedDirectory = filedialog.askdirectory()
     if modeVar.get() == "Export":
-        selectedDirectory = filedialog.asksaveasfilename(defaultextension=".ltd", filetypes=[('LtD Mii Files', '*.ltd')])
+        if itemVar.get() == "Mii":
+            selectedDirectory = filedialog.asksaveasfilename(defaultextension=".ltd", filetypes=[('LtD Mii Files', '*.ltd')])
+        else:
+            selectedDirectory = filedialog.asksaveasfilename(defaultextension=".ltd", filetypes=[('LtD Custom Files', '*.ltdc')])
     if modeVar.get() == "List":
         selectedDirectory = filedialog.askdirectory()
     if selectedDirectory:
@@ -118,6 +127,9 @@ parser.add_argument("save", type=str, help="save folder location", nargs="?")
 parser.add_argument("slot", type=int, help="Mii slot to import/export", nargs="?")
 
 args = parser.parse_args()
+
+ugcTypeString = list(["Food","Clothing"])
+ugcTypeIndex = list(["Food","Cloth"])
 
 def ShareMii(mode: str, slot: int, save: str, miipath:str):
 
@@ -447,6 +459,7 @@ def beginProcess():
     file = fileVar.get()
     slot = slotVar.get()
     slot = int(slot.split(" - ")[0])
+    item = itemVar.get()
 
     if (file == "Drag & drop or choose Mii here") & (mode == "Export"):
         file = "auto"
@@ -454,7 +467,12 @@ def beginProcess():
         file = os.path.join(file,"auto")
 
     if mode != "Export All":
-        ShareMii(mode, slot, folder, file)
+        if item == "Mii":
+            ShareMii(mode, slot, folder, file)
+        if item == "Food":
+            ShareFood(mode, slot, folder, file)
+        if item == "Clothing":
+            ShareCloth(mode, slot, folder, file)
         getSlots(folder)
     else:
         if not (os.path.isdir(file)):
@@ -466,9 +484,12 @@ def beginProcess():
         for x in range(len(names)):
             slot = names[x]
             slot = int(slot.split(" - ")[0])
+        if item == "Mii":
             ShareMii(mode, slot, folder, file)
-
-
+        if item == "Food":
+            ShareFood(mode, slot, folder, file)
+        if item == "Clothing":
+            ShareCloth(mode, slot, folder, file)
 
 ##GUI Setup
 root = TkinterDnD.Tk()
@@ -483,6 +504,7 @@ root.resizable(True,True)
 style = ttk.Style(root)
 
 modeVar=tk.StringVar()
+itemVar=tk.StringVar()
 slotVar=tk.StringVar(value="1")
 folderVar=tk.StringVar(value="Drag & drop or upload save folder here")
 fileVar=tk.StringVar(value="Drag & drop or choose Mii here")
@@ -492,75 +514,101 @@ logo = tk.PhotoImage(file=resourcePath("logo.png"))
 ttk.Label(root, image=logo).grid(row=0, column=1, padx=5, pady=5)
 
 ## Row 1
-ttk.Label(root, text="Select Mode:").grid(row=1, column=0, padx=5, pady=5, sticky=tk.E)
-modeEntry = ttk.OptionMenu(root, modeVar,"List","Import", "Export", "Export All", "List").grid(row=1, column=1, padx=5, pady=5, sticky=tk.W)
+ttk.Label(root, text="Select Item:").grid(row=1, column=0, padx=5, pady=5, sticky=tk.E)
+itemEntry = ttk.OptionMenu(root, itemVar,"Mii","Mii","Food","Clothing").grid(row=1, column=1, padx=5, pady=5, sticky=tk.W)
 
 ## Row 2
-ttk.Label(root, text="Select Save Folder:").grid(row=2, column=0, padx=5, pady=5, sticky=tk.E)
+ttk.Label(root, text="Select Mode:").grid(row=2, column=0, padx=5, pady=5, sticky=tk.E)
+modeEntry = ttk.OptionMenu(root, modeVar,"List","Import", "Export", "Export All", "List").grid(row=2, column=1, padx=5, pady=5, sticky=tk.W)
+
+## Row 3
+ttk.Label(root, text="Select Save Folder:").grid(row=3, column=0, padx=5, pady=5, sticky=tk.E)
 folderEntry = ttk.Entry(root, textvariable=folderVar, width=50)
 folderEntry.drop_target_register(DND_FILES)
 folderEntry.dnd_bind('<<Drop>>',dragndrop)
-folderEntry.grid(row=2, column=1, padx=5, pady=5,sticky=tk.NSEW)
-browseButton = ttk.Button(root, text="Browse...", width=12, command=browseFolder).grid(row=2, column=2, padx=3, pady=3, sticky=tk.W)
+folderEntry.grid(row=3, column=1, padx=5, pady=5,sticky=tk.NSEW)
+browseButton = ttk.Button(root, text="Browse...", width=12, command=browseFolder).grid(row=3, column=2, padx=3, pady=3, sticky=tk.W)
 
-## Row 3
-ttk.Label(root, text="Open/Save As Mii:").grid(row=3, column=0, padx=5, pady=5, sticky=tk.E)
+## Row 4
+ttk.Label(root, text="Open/Save As Mii:").grid(row=4, column=0, padx=5, pady=5, sticky=tk.E)
 fileEntry = ttk.Entry(root, textvariable=fileVar, width=50)
 fileEntry.drop_target_register(DND_FILES)
 fileEntry.dnd_bind('<<Drop>>',dragndrop)
-fileEntry.grid(row=3, column=1, padx=5, pady=5,sticky=tk.NSEW)
-browseButton = ttk.Button(root, text="Browse...", width=12, command=browseFile).grid(row=3, column=2, padx=3, pady=3, sticky=tk.W)
-
-## Row 4
-ttk.Label(root, text="Select Slot:").grid(row=4, column=0, padx=5, pady=5, sticky=tk.E)
-slotEntry = ttk.Combobox(root, textvariable=slotVar, state="readonly")
-slotEntry.grid(row=4, column=1, padx=5, pady=5, sticky=tk.W)
-slotEntry["values"]=list(range(0, 71))
+fileEntry.grid(row=4, column=1, padx=5, pady=5,sticky=tk.NSEW)
+browseButton = ttk.Button(root, text="Browse...", width=12, command=browseFile).grid(row=4, column=2, padx=3, pady=3, sticky=tk.W)
 
 ## Row 5
-startButton = ttk.Button(root, text="Start!", command=beginProcess, width=20).grid(row=5, column=1, padx=5, pady=5)
+ttk.Label(root, text="Select Slot:").grid(row=5, column=0, padx=5, pady=5, sticky=tk.E)
+slotEntry = ttk.Combobox(root, textvariable=slotVar, state="readonly")
+slotEntry.grid(row=5, column=1, padx=5, pady=5, sticky=tk.W)
+slotEntry["values"]=list(range(0, 71))
 
 ## Row 6
+startButton = ttk.Button(root, text="Start!", command=beginProcess, width=20).grid(row=6, column=1, padx=5, pady=5)
+
+## Row 7
 guiOutput = ScrolledText(root,height=10,width=40)
-guiOutput.grid(row=6, column=1,sticky=tk.NSEW)
+guiOutput.grid(row=7, column=1,sticky=tk.NSEW)
 
 sv_ttk.set_theme(darkdetect.theme())
 
 def updateSlots(options):
     slotEntry["values"] = options
+    if itemVar.get() == "Mii":
+        slotEntry.current(1)
+    else:
+        slotEntry.current(0)
 
-def getSlots(folder):
-
-    miiLocation = folder + "/Mii.sav"
-    playerLocation = folder + "/Player.sav"
-
+def getSlots(folder): 
+    if folderVar.get() == "Drag & drop or upload save folder here":
+        return()
     with open(folder + "/Mii.sav", "rb") as f:
         miisav = bytearray(f.read())
 
     with open(folder + "/Player.sav", "rb") as f:
         playersav = bytearray(f.read())
-    
-    miiOffset3=399072
-    miiOffset4=offsetLocator(miisav,"2499BFDA") + 4
-    miiOffset6=offsetLocator(miisav,"881CA27A") + 4 # Earliest offset for Mii data
-    persOffsetP1=int("F414",16) # Personality Values
 
-    if sum(playersav[miiOffset3:miiOffset3+156]) != 152:
+    item = itemVar.get()
+    if item == "Mii":
+        miinames=offsetLocator(miisav,"2499BFDA") + 4
+        miiOffset6=offsetLocator(miisav,"881CA27A") + 4
         filledSlots = ["0 - In-Progress Mii"]
-    else:
-        filledSlots = ["0 - In-Progress Mii"] # Leaving this here in case I ever want to make it so it checks for temp slot being used.
-    
-    miinames = miiOffset4
-
-    for x in range(69):
-        miiindex = miiOffset6 + 156 * (x)
-        miilistname = miisav[miinames+((x)*64):miinames+((x)*64)+64]
-        if sum(miisav[miiindex:miiindex+156]) != 152:
-            printName = miilistname[:miilistname.find(bytes.fromhex("00 00 00"))]
-            if len(printName) % 2 == 1:
-                printName.append(0)
-            filledSlots.append(str(x+1) + " - " + str(printName.decode("utf-16")))
+        for x in range(69):
+            miiindex = miiOffset6 + 156 * (x)
+            miilistname = miisav[miinames+((x)*64):miinames+((x)*64)+64]
+            if sum(miisav[miiindex:miiindex+156]) != 152:
+                printName = miilistname[:miilistname.find(bytes.fromhex("00 00 00"))]
+                if len(printName) % 2 == 1:
+                    printName.append(0)
+                filledSlots.append(str(x+1) + " - " + str(printName.decode("utf-16")))
+    if item == "Food":
+        maxSlots = 99
+        ugcType = item
+        nOffset1=offsetLocator(playersav,"408494F5") + 4
+        filledSlots = []
+    if item == "Clothing":
+        maxSlots = 99
+        ugcType = "Cloth"
+        nOffset1=offsetLocator(playersav,"40710642") + 4
+        filledSlots = []
+    if item != "Mii":
+        for x in range(maxSlots):
+            if x < 10:
+                ugcFile = "/Ugc"+ ugcType + "00" + str(x) + ".canvas.zs"
+            else:
+                ugcFile = "/Ugc"+ ugcType + "0" + str(x) + ".canvas.zs"
+            ugcName = playersav[nOffset1+((x)*128):nOffset1+((x)*128)+128]
+            if os.path.isfile(folder + "/Ugc" + ugcFile):
+                ugcPrintName = ugcName[:ugcName.find(bytes.fromhex("00 00 00"))]
+                if len(ugcPrintName) % 2 == 1:
+                    ugcPrintName.append(0)
+                filledSlots.append(str(x+1) + " - " + ugcPrintName.decode("utf-16"))
     updateSlots(filledSlots)
+
+itemVar.trace_add(
+    "write",
+    lambda *args: getSlots(folderVar.get())
+)
 
 ## Run script
 ## Using any args causes the CLI to activate, using none will start the GUI
