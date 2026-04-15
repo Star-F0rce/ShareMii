@@ -91,13 +91,13 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
         playersav = bytearray(f.read())
 
     EOffset1=offsetLocator(playersav,"F4A39965") + 4 # Food
-    EOffset2=offsetLocator(playersav,"AF129C33") + 4# Cloth
+    EOffset2=offsetLocator(playersav,"AF129C33") + 4 # Cloth
     ugcEnableOffsets= list([EOffset1,EOffset2])
-    TOffset1=offsetLocator(playersav,"3558B77F") + 4# Food
-    TOffset2=offsetLocator(playersav,"59BFA9D3") + 4# Cloth
+    TOffset1=offsetLocator(playersav,"3558B77F") + 4 # Food
+    TOffset2=offsetLocator(playersav,"59BFA9D3") + 4 # Cloth
     ugcTexOffsets = list([TOffset1,TOffset2])
-    HOffset1=offsetLocator(playersav,"6D48F8E2") + 4# Food
-    HOffset2=offsetLocator(playersav,"89F25CAC") + 4# Cloth
+    HOffset1=offsetLocator(playersav,"6D48F8E2") + 4 # Food
+    HOffset2=offsetLocator(playersav,"89F25CAC") + 4 # Cloth
     ugcHashOffsets = list([HOffset1,HOffset2])
     ugcHashIndex = list([1,3])
 
@@ -121,6 +121,10 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
         # Import the args
         with open(ugcpath, "rb") as f:
             ugc = bytearray(f.read())
+
+        if (ugcKind == 1) & (isAdding == False):
+            if playersav[ugcOffsets[0]+(slot)*4:ugcOffsets[0]+(slot)*4+4] != ugc[4:4+4]:
+                raise RuntimeError("This Clothing item is not the same type as what you're importing! Find the same type or add the item.")
 
         #Find where block files begin
         nameStart = ugc.find(bytes.fromhex("A2 A2 A2 A2")) + 4

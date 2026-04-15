@@ -619,8 +619,10 @@ def getSlots(folder):
                     ugcPrintName.append(0)
                 filledSlots.append(str(x+1) + " - " + ugcPrintName.decode("utf-16"))
             if (not os.path.isfile(folder + "/Ugc" + ugcFile)) & (New == False):
-                filledSlots.append(str(x+1) + " - Add New Item")
+                NewSlot = str(x+1) + " - Add New Item"
                 New = True
+        if New:
+            filledSlots.append(NewSlot)
     updateSlots(filledSlots)
 
 itemVar.trace_add(
