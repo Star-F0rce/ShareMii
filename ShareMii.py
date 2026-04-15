@@ -210,6 +210,11 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
         with open(miipath, "rb") as f:
             mii = bytearray(f.read())
 
+        if mii == bytearray():
+            raise RuntimeError("This Mii is empty!")
+        if mii[0] not in range(1,3):
+            raise RuntimeError(".ltd not recognized. Is this really a Mii?")
+
         ## CONVERSION
         # ltdv3 changed certain parts of the file to be more consistent. This check will convert old Miis into ones that work
         if mii[0] < 3:
@@ -221,6 +226,9 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
                 mii = mii[:canvasStart] + bytearray([163]) + mii[canvasStart:]
                 mii[ugcStart+1:ugcStart+4] = bytearray.fromhex("A4 A4 A4")
                 mii = mii[:ugcStart + 3] + bytearray([164]) + mii[ugcStart + 3:]
+
+        if mii[30] != 110:
+            raise RuntimeError(".ltd not recognized. Is this really a Mii?")
 
         #Find where miis are stored in Mii.sav
         paintindex = fpOffset3 + 4 * (slot)
