@@ -49,7 +49,6 @@ def browseFolder():
     if selectedDirectory:
         folderVar.set(selectedDirectory)
         guiOutput.delete("1.0", "end")
-        ShareMii("List", 1, selectedDirectory, "2")
         getSlots(selectedDirectory)
         slotEntry.current(1)
 
@@ -76,7 +75,6 @@ def dragndrop(event):
     if event.widget == folderEntry:
         folderVar.set(path)
         guiOutput.delete("1.0", "end")
-        ShareMii("List", 1, path, "2")
         getSlots(path)
         slotEntry.current(1)
     else:
