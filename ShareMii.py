@@ -15,7 +15,7 @@ from tkinterdnd2 import DND_FILES, TkinterDnD
 
 majVersion = 3
 minVersion = 1
-preVersion = 2
+preVersion = ""
 if preVersion:
     preVersion = str(".pre" + str(preVersion))
 versionStr = str(majVersion) + "." + str(minVersion) + preVersion
