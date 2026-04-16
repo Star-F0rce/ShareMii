@@ -175,8 +175,8 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
     persOffsetP2=offsetLocator(miisav,"CD8DBAF8") + 4 # Mii.CharacterParam.Audaciousness
     persOffsetP3=offsetLocator(miisav,"25B48224") + 4 # Mii.CharacterParam.Activeness
     persOffsetP4=offsetLocator(miisav,"607BA160") + 4 # Mii.CharacterParam.Commonsense
-    persOffsetP5=offsetLocator(miisav,"607BA160") + 4 # Mii.CharacterParam.Gaiety
-    persOffsetV1=offsetLocator(miisav,"4913AE1A") + 4 # Mii.Voice.Formant
+    persOffsetP5=offsetLocator(miisav,"68E1134E") + 4 # Mii.CharacterParam.Gaiety
+    persOffsetV1=offsetLocator(miisav,"4913AE1A") + 4 # Mii.Voice.Formants
     persOffsetV2=offsetLocator(miisav,"141EE086") + 4 # Mii.Voice.Speed
     persOffsetV3=offsetLocator(miisav,"07B9D175") + 4 # Mii.Voice.Intonation
     persOffsetV4=offsetLocator(miisav,"81CF470A") + 4 # Mii.Voice.Pitch
@@ -286,17 +286,13 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
             #The fun part! Telling the game to read the facepaint files.
             if slot == -1:
                 facepaintID = 70
-                facepaintFile="070"
-                playersav[fpOffset1+4*(facepaintID ):fpOffset1+4*(facepaintID )+4] = bytearray.fromhex('F4 01 00 00')
-                playersav[fpOffset2+4*(facepaintID ):fpOffset2+4*(facepaintID )+4] = bytearray.fromhex('41 49 93 56')
-                playersav[fpOffset5+4*(facepaintID ):fpOffset5+4*(facepaintID )+1] = bytearray.fromhex('46')
             else:
                 miisav[miiOffset2+4*(slot):miiOffset2+4*(slot)+4] = bytearray([facepaintID, 0, 0, 0])
-                playersav[fpOffset1+4*(facepaintID ):fpOffset1+4*(facepaintID )+4] = bytearray.fromhex('F4 01 00 00')
-                playersav[fpOffset2+4*(facepaintID ):fpOffset2+4*(facepaintID )+4] = bytearray.fromhex('41 49 93 56')
-                playersav[fpOffset3+4*(facepaintID ):fpOffset3+4*(facepaintID )+4] = bytearray.fromhex('F4 AD 7F 1D')
-                playersav[fpOffset4+4*(facepaintID ):fpOffset4+4*(facepaintID )+4] = bytearray.fromhex('00 80 00 00')
-                playersav[fpOffset5+4*(facepaintID ):fpOffset5+4*(facepaintID )+4] = bytearray([facepaintID, 0, 8, 0])
+            playersav[fpOffset1+4*(facepaintID ):fpOffset1+4*(facepaintID )+4] = bytearray.fromhex('F4 01 00 00')
+            playersav[fpOffset2+4*(facepaintID ):fpOffset2+4*(facepaintID )+4] = bytearray.fromhex('41 49 93 56')
+            playersav[fpOffset3+4*(facepaintID ):fpOffset3+4*(facepaintID )+4] = bytearray.fromhex('F4 AD 7F 1D')
+            playersav[fpOffset4+4*(facepaintID ):fpOffset4+4*(facepaintID )+4] = bytearray.fromhex('00 80 00 00')
+            playersav[fpOffset5+4*(facepaintID ):fpOffset5+4*(facepaintID )+4] = bytearray([facepaintID, 0, 8, 0])
 
             if facepaintID < 10:
                 facepaintFile = "00" + str(facepaintID)
