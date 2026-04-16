@@ -332,8 +332,11 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
         if (ugcpath[-4:] == "auto"):
                 ugcpath = ugcpath[:-4] + sanitName
 
-        if ".ltdc" not in ugcpath:
-            ugcpath += ".ltdc"
+        fExtensionDef=[".ltdf",".ltdc",".ltdg",".ltdi",".ltde",".ltdo",".ltdl"]
+        fExtensionDef=str(fExtensionDef[ugcKind])
+
+        if fExtensionDef not in ugcpath:
+            ugcpath += fExtensionDef
 
         with open(ugcpath, "wb") as f:
             f.write(output)

@@ -58,18 +58,23 @@ def browseFolder():
 ## Used to browse files in GUI
 def browseFile():
     # Opens folder selection dialog
+
+    item = itemVar.get()
+    itemList = list(["Mii","Food","Clothing","Treasure","Interior","Exterior","Objects","Landscaping"])
+    item = itemList.index(item)
+
+    fExtensionDesc=["LtD Mii Files","LtD Food Files","LtD Cloth Files","LtD Goods Files","LtD Interior Files","LtD Exterior Files","LtD MapObject Files","LtD MapFloor Files"]
+    fExtensionType=["*.ltd","*.ltdf","*.ltdc","*.ltdg","*.ltdi","*.ltde","*.ltdo","*.ltdl"]
+    fExtensionDef=[".ltd",".ltdf",".ltdc",".ltdg",".ltdi",".ltde",".ltdo",".ltdl"]
+    fExtensionDesc=str(fExtensionDesc[item])
+    fExtensionType=str(fExtensionType[item])
+    fExtensionDef=str(fExtensionDef[item])
     if modeVar.get() == "Import":
-        if itemVar.get() == "Mii":
-            selectedDirectory = filedialog.askopenfilename(defaultextension=".ltd", filetypes=[('LtD Mii Files', '*.ltd')])
-        else:
-            selectedDirectory = filedialog.askopenfilename(defaultextension=".ltd", filetypes=[('LtD Custom Files', '*.ltdc')])
+        selectedDirectory = filedialog.askopenfilename(defaultextension=fExtensionDef, filetypes=[(fExtensionDesc, fExtensionType)])
     if modeVar.get() == "Export All":
         selectedDirectory = filedialog.askdirectory()
     if modeVar.get() == "Export":
-        if itemVar.get() == "Mii":
-            selectedDirectory = filedialog.asksaveasfilename(defaultextension=".ltd", filetypes=[('LtD Mii Files', '*.ltd')])
-        else:
-            selectedDirectory = filedialog.asksaveasfilename(defaultextension=".ltd", filetypes=[('LtD Custom Files', '*.ltdc')])
+        selectedDirectory = filedialog.asksaveasfilename(defaultextension=fExtensionDef, filetypes=[(fExtensionDesc, fExtensionType)])
     if modeVar.get() == "List":
         selectedDirectory = filedialog.askdirectory()
     if selectedDirectory:
