@@ -92,6 +92,11 @@ def dragndrop(event):
         getSlots(path)
         slotEntry.current(1)
     else:
+        if not (os.path.isdir(path)):
+            itemList = list(["Mii","Food","Clothing","Treasure","Interior","Exterior","Objects","Landscaping"])
+            fExtensionDef=[".ltd",".ltdf",".ltdc",".ltdg",".ltdi",".ltde",".ltdo",".ltdl"]
+            ext = Path(path).suffix
+            itemVar.set(itemList[fExtensionDef.index(ext)])
         fileVar.set(path)
 
 def offsetLocator(file, hashStr):
@@ -494,14 +499,17 @@ def beginProcess():
         file = os.path.join(file,"auto")
         mode = "Export"
         names = slotEntry["values"]
-        names = names[1:]
+        if item == "-1":
+            names = names[1:]
+        else:
+            names = names[:len(names) - 1]
         for x in range(len(names)):
             slot = names[x]
             slot = int(slot.split(" - ")[0])
-        if item == "-1":
-            ShareMii(mode, slot, folder, file)
-        else:
-            ugcStart(mode, slot, folder, file, isAdding)
+            if item == "-1":
+                ShareMii(mode, slot, folder, file)
+            else:
+                ugcStart(mode, slot, folder, file, isAdding)
 
 ##GUI Setup
 root = TkinterDnD.Tk()
