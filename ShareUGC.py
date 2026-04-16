@@ -223,6 +223,9 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
         if (ugcKind in range(1,2)) & (isAdding == False):
             if playersav[ugcOffsets[0]+(slot)*4:ugcOffsets[0]+(slot)*4+4] != ugc[4:4+4]:
                 raise RuntimeError("This item is not the same subtype as what you're importing! Find the same type or add the item.")
+            
+        if (ugcKind in range(4,5)) & (isAdding == False):
+            raise RuntimeError("You can only add Exterior and Objects. Please use the add slot.")
 
         #Find where block files begin
         nameStart = ugc.find(bytes.fromhex("A2 A2 A2 A2")) + 4
