@@ -128,8 +128,8 @@ parser.add_argument("slot", type=int, help="Mii slot to import/export", nargs="?
 
 args = parser.parse_args()
 
-ugcTypeString = list(["Food","Clothing"])
-ugcTypeIndex = list(["Food","Cloth"])
+ugcTypeString = list(["Food","Clothing","Treasure","Interior","Exterior","Objects","Landscaping"])
+ugcTypeIndex = list(["Food","Cloth","Goods","Interior","Exterior","MapObject","MapFloor"])
 
 def ShareMii(mode: str, slot: int, save: str, miipath:str):
 

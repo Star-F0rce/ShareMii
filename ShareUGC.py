@@ -101,7 +101,7 @@ def ugcStart(mode: str, slot: int, save: str, ugcpath:str, isAdding:bool, ugcKin
         fOffset2=offsetLocator(playersav,"835114C1") + 4 # UGC.Interior.UgcImpressionType
         lOffset1=offsetLocator(playersav,"EC65E2E4") + 4 # UGC.Interior.EmissionIntensity
         lOffset2=offsetLocator(playersav,"0A7CF2C5") + 4 # UGC.Interior.EmissionPattern
-        lOffset3=offsetLocator(playersav,"60E280FB") + 4 # UGC.Interior.IsEmissionNightOnly
+        lOffset3=offsetLocator(playersav,"662CD807") + 4 # UGC.Interior.IsEmissionNightOnly
         lOffset4=offsetLocator(playersav,"01B3661E") + 4 # UGC.Interior.WordAttrCount
         lOffset5=offsetLocator(playersav,"5AF4A09F") + 4 # UGC.Interior.WordAttrGrammaticality
         lOffset6=offsetLocator(playersav,"41FF2201") + 4 # UGC.Interior.Price
@@ -149,6 +149,21 @@ def ugcStart(mode: str, slot: int, save: str, ugcpath:str, isAdding:bool, ugcKin
         nOffsets=list([nOffset1,nOffset2])
         vOffset=offsetLocator(playersav,"27F2ECDE") + 4 # UGC.MapObject.Scale
         v2Offset=offsetLocator(playersav,"2F96203B") + 4 # UGC.MapObject.MaterialTexScale
+    if ugcKind == 6: # MapFloor
+        fOffset1=offsetLocator(playersav,"21D582D9") + 4 # UGC.MapFloor.UgcFloorMaterialType
+        fOffset2=offsetLocator(playersav,"DE7CB924") + 4 # UGC.MapFloor.UgcFloorCostType
+        lOffset1=offsetLocator(playersav,"E8BD8C89") + 4 # UGC.MapFloor.EmissionIntensity
+        lOffset2=offsetLocator(playersav,"C35B8B0F") + 4 # UGC.MapFloor.EmissionPattern
+        lOffset3=offsetLocator(playersav,"60E280FB") + 4 # UGC.MapFloor.IsEmissionNightOnly
+        lOffset4=offsetLocator(playersav,"7EC3836A") + 4 # UGC.MapFloor.WordAttrCount
+        lOffset5=offsetLocator(playersav,"F209E2F9") + 4 # UGC.MapFloor.WordAttrGrammaticality
+        lOffset6=offsetLocator(playersav,"6D842ACC") + 4 # UGC.MapFloor.Price
+        nOffset1=offsetLocator(playersav,"918875A9") + 4 # UGC.MapFloor.Name
+        nOffset2=offsetLocator(playersav,"503490E0") + 4 # UGC.MapFloor.HowToCallName
+        ugcOffsets=list([fOffset1,fOffset2,lOffset1,lOffset2,lOffset3,lOffset4,lOffset5,lOffset6])
+        nOffsets=list([nOffset1,nOffset2])
+        vOffset=0
+        v2Offset=0
     shareUGC(mode, slot, save, ugcpath, ugcKind, ugcOffsets,nOffsets, vOffset, v2Offset, isAdding)
     return()
 
@@ -182,6 +197,7 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
     HOffset7=offsetLocator(playersav,"816D50A3") + 4 # MapFloor
     ugcHashOffsets = list([HOffset1,HOffset2,HOffset3,HOffset4,HOffset5,HOffset6,HOffset7])
     ugcHashIndex = list([1,3,2,6,7,4,5])
+    ugcTexData = bytearray.fromhex("41 49 93 56 E3 C2 2F B4 41 49 93 56 E3 C2 2F B4 E3 C2 2F B4 E3 C2 2F B4 E3 C2 2F B4")
 
     ## LIST MODE ###################################################################
     if mode == "List":
@@ -239,7 +255,7 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
 
         if isAdding:
             playersav[ugcEnableOffsets[ugcKind]+(slot)*4:ugcEnableOffsets[ugcKind]+(slot)*4+4] = bytearray.fromhex("F4 AD 7F 1D")
-            playersav[ugcTexOffsets[ugcKind]+(slot)*4:ugcTexOffsets[ugcKind]+(slot)*4+4] = bytearray.fromhex("41 49 93 56")
+            playersav[ugcTexOffsets[ugcKind]+(slot)*4:ugcTexOffsets[ugcKind]+(slot)*4+4] = ugcTexData[ugcKind*4:ugcKind*4+4]
             playersav[ugcHashOffsets[ugcKind]+(slot)*4:ugcHashOffsets[ugcKind]+(slot)*4+4] = bytearray([slot, 0, int(ugcHashIndex[ugcKind]), 0])
 
         playersav[nOffsets[0]+((slot)*128):nOffsets[0]+((slot)*128)+128] = ugc[nameStart:nameStart+128]
