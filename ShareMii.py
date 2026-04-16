@@ -509,7 +509,7 @@ def beginProcess():
             if item == "-1":
                 ShareMii(mode, slot, folder, file)
             else:
-                ugcStart(mode, slot, folder, file, isAdding)
+                ugcStart(mode, slot, folder, file, isAdding, item)
 
 ##GUI Setup
 root = TkinterDnD.Tk()
