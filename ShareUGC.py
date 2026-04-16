@@ -15,11 +15,10 @@ def offsetLocator(file, hashStr):
     
     return offset
 
-ugcTypeString = list(["Food","Clothing"])
-ugcTypeIndex = list(["Food","Cloth"])
+ugcTypeString = list(["Food","Clothing","Treasure"])
+ugcTypeIndex = list(["Food","Cloth","Goods"])
 
 def ugcStart(mode: str, slot: int, save: str, ugcpath:str, isAdding:bool, ugcKind:int):
-
 
     with open(save + "/Player.sav", "rb") as f:
         playersav = bytearray(f.read())
@@ -46,6 +45,7 @@ def ugcStart(mode: str, slot: int, save: str, ugcpath:str, isAdding:bool, ugcKin
         nOffset2=offsetLocator(playersav,"BA0F4BAF") + 4 # UGC.Food.HowToCallName
         ugcOffsets=list([fOffset1,fOffset2,fOffset3,fOffset4,fOffset5,fOffset6,fOffset7,fOffset8,fOffset9,fOffset10])
         nOffsets=list([nOffset1,nOffset2])
+        vOffset=list([])
     if ugcKind == 1: # Clothes
         fOffset1=offsetLocator(playersav,"C81545FE") + 4 # UGC.Cloth.UgcClothType
         fOffset2=offsetLocator(playersav,"2FB9146D") + 4 # UGC.Cloth.ClothSeasonType
@@ -61,24 +61,60 @@ def ugcStart(mode: str, slot: int, save: str, ugcpath:str, isAdding:bool, ugcKin
         nOffset2=offsetLocator(playersav,"CF9A13EA") + 4 # UGC.Cloth.HowToCallName
         ugcOffsets=list([fOffset1,fOffset2,fOffset3,fOffset4,lOffset1,lOffset2,lOffset3,lOffset4,lOffset5,lOffset6])
         nOffsets=list([nOffset1,nOffset2])
-    shareUGC(mode, slot, save, ugcpath, ugcKind, ugcOffsets,nOffsets, isAdding)
+        vOffset=list([])
+    if ugcKind == 2: # Goods
+        ## Anything
+        fOffset1=offsetLocator(playersav,"3FAA2222") + 4 # UGC.Goods.UgcGoodsType
+        fOffset2=offsetLocator(playersav,"823F8297") + 4 # UGC.Goods.UgcGoodsFeature
+        fOffset3=offsetLocator(playersav,"7ECC8A60") + 4 # UGC.Goods.OtherEffect
+        ## Book
+        vOffset=offsetLocator(playersav,"F36C4E28") + 4 # UGC.Goods.BaseColor
+        fOffset7=offsetLocator(playersav,"88DC1D43") + 4 # UGC.Goods.BookType
+        ## CD
+        fOffset8=offsetLocator(playersav,"8896DDD6") + 4 # UGC.Goods.CDSound
+        ## DVD
+        fOffset9=offsetLocator(playersav,"BFF29472") + 4 # UGC.Goods.DVDSound
+        ## Game
+        fOffset10=offsetLocator(playersav,"5D965762") + 4 # UGC.Goods.GameSound
+        ## Pet
+        fOffset11=offsetLocator(playersav,"78D39208") + 4 # UGC.Goods.PetBehavior
+        fOffset12=offsetLocator(playersav,"53C762B0") + 4 # UGC.Goods.PetDirection
+        fOffset13=offsetLocator(playersav,"40D2C6FE") + 4 # UGC.Goods.PetVoiceEffectType
+        fOffset14=offsetLocator(playersav,"C0A6C046") + 4 # UGC.Goods.PetVoiceType
+        ## Everything
+        lOffset1=offsetLocator(playersav,"AE373B0D") + 4 # UGC.Goods.EmissionIntensity
+        lOffset2=offsetLocator(playersav,"7D5FFBB7") + 4 # UGC.Goods.EmissionPattern
+        lOffset3=offsetLocator(playersav,"9E978F5E") + 4 # UGC.Goods.IsEmissionNightOnly
+        lOffset4=offsetLocator(playersav,"F6349929") + 4 # UGC.Goods.WordAttrCount
+        lOffset5=offsetLocator(playersav,"9038CDD0") + 4 # UGC.Goods.WordAttrGrammaticality
+        lOffset6=offsetLocator(playersav,"9A59F58A") + 4 # UGC.Goods.Price
+        nOffset1=offsetLocator(playersav,"2F793EB1") + 4 # UGC.Goods.Name
+        nOffset2=offsetLocator(playersav,"F655B33A") + 4 # UGC.Goods.HowToCallName
+        nOffset3=offsetLocator(playersav,"F36A5A0B") + 4 # UGC.Goods.GoodsText
+        nOffset4=offsetLocator(playersav,"A66367EB") + 4 # UGC.Goods.HowToCallGoodsText
+        ugcOffsets=list([fOffset1,fOffset2,fOffset3,fOffset7,fOffset8,fOffset9,fOffset10,fOffset11,fOffset12,fOffset13,fOffset14,lOffset1,lOffset2,lOffset3,lOffset4,lOffset5,lOffset6])
+        nOffsets=list([nOffset1,nOffset2,nOffset3,nOffset4])
+    shareUGC(mode, slot, save, ugcpath, ugcKind, ugcOffsets,nOffsets, vOffset, isAdding)
     return()
 
-def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffsets:list, nOffsets:list, isAdding:bool):
+def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffsets:list, nOffsets:list, vOffset:int, isAdding:bool):
     ugcType= ugcTypeIndex[ugcKind]
     with open(save + "/Player.sav", "rb") as f:
         playersav = bytearray(f.read())
 
     EOffset1=offsetLocator(playersav,"F4A39965") + 4 # Food
     EOffset2=offsetLocator(playersav,"AF129C33") + 4 # Cloth
-    ugcEnableOffsets= list([EOffset1,EOffset2])
+    EOffset3=offsetLocator(playersav,"1A9C00FE") + 4 # Goods
+    ugcEnableOffsets= list([EOffset1,EOffset2,EOffset3])
     TOffset1=offsetLocator(playersav,"3558B77F") + 4 # Food
     TOffset2=offsetLocator(playersav,"59BFA9D3") + 4 # Cloth
-    ugcTexOffsets = list([TOffset1,TOffset2])
+    TOffset3=offsetLocator(playersav,"70D10A48") + 4 # Goods
+    ugcTexOffsets = list([TOffset1,TOffset2,TOffset3])
     HOffset1=offsetLocator(playersav,"6D48F8E2") + 4 # Food
     HOffset2=offsetLocator(playersav,"89F25CAC") + 4 # Cloth
-    ugcHashOffsets = list([HOffset1,HOffset2])
-    ugcHashIndex = list([1,3])
+    HOffset3=offsetLocator(playersav,"56202100") + 4 # Goods
+    ugcHashOffsets = list([HOffset1,HOffset2,HOffset3])
+    ugcHashIndex = list([1,3,2])
 
     ## LIST MODE ###################################################################
     if mode == "List":
@@ -101,9 +137,9 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
         with open(ugcpath, "rb") as f:
             ugc = bytearray(f.read())
 
-        if (ugcKind == 1) & (isAdding == False):
+        if (ugcKind in range(1,2)) & (isAdding == False):
             if playersav[ugcOffsets[0]+(slot)*4:ugcOffsets[0]+(slot)*4+4] != ugc[4:4+4]:
-                raise RuntimeError("This Clothing item is not the same type as what you're importing! Find the same type or add the item.")
+                raise RuntimeError("This item is not the same subtype as what you're importing! Find the same type or add the item.")
 
         #Find where block files begin
         nameStart = ugc.find(bytes.fromhex("A2 A2 A2 A2")) + 4
@@ -141,6 +177,11 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
 
         playersav[nOffsets[0]+((slot)*128):nOffsets[0]+((slot)*128)+128] = ugc[nameStart:nameStart+128]
         playersav[nOffsets[1]+((slot)*128):nOffsets[1]+((slot)*128)+128] = ugc[nameStart+128:nameStart+(128*2)]
+        if ugcKind == 2:
+            playersav[nOffsets[2]+((slot)*64):nOffsets[2]+((slot)*64)+64] = ugc[nameStart+(128*2):nameStart+(128*2)+64]
+            playersav[nOffsets[3]+((slot)*128):nOffsets[3]+((slot)*128)+128] = ugc[nameStart+(128*2)+64:nameStart+(128*3)+64]
+        if vOffset:
+            playersav[vOffset+((slot)*12):vOffset+((slot)*12)+12] = ugc[nameStart-16:nameStart-4]
         print("Personal data replaced!")
 
         with open(save + "/Player.sav", "wb") as f:
@@ -154,13 +195,22 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
         ### PERSONALITY ###
         ugcData=bytearray()
         # This loop grabs nearly all personality aspects from a Mii
-        for x in range(10):
+        for x in range(len(ugcOffsets)):
             CurrentUGCV=playersav[ugcOffsets[x]+(slot)*4:ugcOffsets[x]+(slot)*4+4]
             ugcData.extend(CurrentUGCV)
         
         ltdData = bytearray([ugcKind, 0, 0, 0])
         name = playersav[nOffsets[0]+((slot)*128):nOffsets[0]+((slot)*128)+128]
         pronounce = playersav[nOffsets[1]+((slot)*128):nOffsets[1]+((slot)*128)+128]
+        if ugcKind ==2:
+            goodsText = playersav[nOffsets[2]+((slot)*64):nOffsets[2]+((slot)*64)+64]
+            goodsPronounce = playersav[nOffsets[3]+((slot)*128):nOffsets[3]+((slot)*128)+128]
+            pronounce.extend(goodsText)
+            pronounce.extend(goodsPronounce)
+        if vOffset:
+            vector = playersav[vOffset+((slot)*12):vOffset+((slot)*12)+12]
+        else:
+            vector = bytearray()
         nameSection = bytearray.fromhex('A2 A2 A2 A2')
         canvasSection = bytearray.fromhex('A3 A3 A3 A3')
         ugcSection = bytearray.fromhex('A4 A4 A4 A4')
@@ -187,7 +237,7 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
         with open(save + "/Ugc/Ugc" + ugcFile + "_Thumb.ugctex.zs", "rb") as f:
             thumbtex = bytearray(f.read())
 
-        output = ltdData + ugcData + nameSection + name + pronounce + canvasSection + canvastex + ugcSection + ugctex + thumbSection + thumbtex
+        output = ltdData + ugcData + vector + nameSection + name + pronounce + canvasSection + canvastex + ugcSection + ugctex + thumbSection + thumbtex
 
         ## If user didn't give a name, we'll just set the name to their Mii name
         if (ugcpath[-4:] == "auto"):

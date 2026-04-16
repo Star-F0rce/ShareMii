@@ -467,7 +467,7 @@ def beginProcess():
     file = fileVar.get()
     slot = slotVar.get()
     item = itemVar.get()
-    itemList = list(["Mii","Food","Clothing"])
+    itemList = list(["Mii","Food","Clothing","Treasure"])
     item = itemList.index(item) - 1
     isAdding = False
     if slot.split(" - ")[1] == "Add New Item":
@@ -484,9 +484,7 @@ def beginProcess():
     if mode != "Export All":
         if item == -1:
             ShareMii(mode, slot, folder, file)
-        if item == 0:
-            ugcStart(mode, slot, folder, file, isAdding, item)
-        if item == 1:
+        else:
             ugcStart(mode, slot, folder, file, isAdding, item)
         getSlots(folder)
     else:
@@ -499,11 +497,9 @@ def beginProcess():
         for x in range(len(names)):
             slot = names[x]
             slot = int(slot.split(" - ")[0])
-        if item == "Mii":
+        if item == "-1":
             ShareMii(mode, slot, folder, file)
-        if item == "Food":
-            ugcStart(mode, slot, folder, file, isAdding)
-        if item == "Clothing":
+        else:
             ugcStart(mode, slot, folder, file, isAdding)
 
 ##GUI Setup
@@ -530,7 +526,7 @@ ttk.Label(root, image=logo).grid(row=0, column=1, padx=5, pady=5)
 
 ## Row 1
 ttk.Label(root, text="Select Item:").grid(row=1, column=0, padx=5, pady=5, sticky=tk.E)
-itemEntry = ttk.OptionMenu(root, itemVar,"Mii","Mii","Food","Clothing").grid(row=1, column=1, padx=5, pady=5, sticky=tk.W)
+itemEntry = ttk.OptionMenu(root, itemVar,"Mii","Mii","Food","Clothing","Treasure").grid(row=1, column=1, padx=5, pady=5, sticky=tk.W)
 
 ## Row 2
 ttk.Label(root, text="Select Mode:").grid(row=2, column=0, padx=5, pady=5, sticky=tk.E)
@@ -605,6 +601,11 @@ def getSlots(folder):
         maxSlots = 99
         ugcType = "Cloth"
         nOffset1=offsetLocator(playersav,"40710642") + 4
+        filledSlots = []
+    if item == "Treasure":
+        maxSlots = 99
+        ugcType = "Goods"
+        nOffset1=offsetLocator(playersav,"2F793EB1") + 4
         filledSlots = []
     if item != "Mii":
         New = False
