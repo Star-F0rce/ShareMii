@@ -467,7 +467,7 @@ def beginProcess():
     file = fileVar.get()
     slot = slotVar.get()
     item = itemVar.get()
-    itemList = list(["Mii","Food","Clothing","Treasure"])
+    itemList = list(["Mii","Food","Clothing","Treasure","Interior","Exterior","Objects","Landscaping"])
     item = itemList.index(item) - 1
     isAdding = False
     if slot.split(" - ")[1] == "Add New Item":
@@ -526,7 +526,7 @@ ttk.Label(root, image=logo).grid(row=0, column=1, padx=5, pady=5)
 
 ## Row 1
 ttk.Label(root, text="Select Item:").grid(row=1, column=0, padx=5, pady=5, sticky=tk.E)
-itemEntry = ttk.OptionMenu(root, itemVar,"Mii","Mii","Food","Clothing","Treasure").grid(row=1, column=1, padx=5, pady=5, sticky=tk.W)
+itemEntry = ttk.OptionMenu(root, itemVar,"Mii","Mii","Food","Clothing","Treasure","Interior","Exterior","Objects","Landscaping").grid(row=1, column=1, padx=5, pady=5, sticky=tk.W)
 
 ## Row 2
 ttk.Label(root, text="Select Mode:").grid(row=2, column=0, padx=5, pady=5, sticky=tk.E)
@@ -598,7 +598,7 @@ def getSlots(folder):
         nOffset1=offsetLocator(playersav,"408494F5") + 4
         filledSlots = []
     if item == "Clothing":
-        maxSlots = 99
+        maxSlots = 299
         ugcType = "Cloth"
         nOffset1=offsetLocator(playersav,"40710642") + 4
         filledSlots = []
@@ -606,6 +606,26 @@ def getSlots(folder):
         maxSlots = 99
         ugcType = "Goods"
         nOffset1=offsetLocator(playersav,"2F793EB1") + 4
+        filledSlots = []
+    if item == "Interior":
+        maxSlots = 99
+        ugcType = item
+        nOffset1=offsetLocator(playersav,"3DE2C5DD") + 4
+        filledSlots = []
+    if item == "Exterior":
+        maxSlots = 99
+        ugcType = item
+        nOffset1=offsetLocator(playersav,"27C875D6") + 4
+        filledSlots = []
+    if item == "Objects":
+        maxSlots = 99
+        ugcType = "MapObject"
+        nOffset1=offsetLocator(playersav,"56F99338") + 4
+        filledSlots = []
+    if item == "Landscaping":
+        maxSlots = 99
+        ugcType = "MapFloor"
+        nOffset1=offsetLocator(playersav,"918875A9") + 4
         filledSlots = []
     if item != "Mii":
         New = False

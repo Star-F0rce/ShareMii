@@ -15,8 +15,8 @@ def offsetLocator(file, hashStr):
     
     return offset
 
-ugcTypeString = list(["Food","Clothing","Treasure"])
-ugcTypeIndex = list(["Food","Cloth","Goods"])
+ugcTypeString = list(["Food","Clothing","Treasure","Interior","Exterior","Objects","Landscaping"])
+ugcTypeIndex = list(["Food","Cloth","Goods","Interior","Exterior","MapObject","MapFloor"])
 
 def ugcStart(mode: str, slot: int, save: str, ugcpath:str, isAdding:bool, ugcKind:int):
 
@@ -45,7 +45,7 @@ def ugcStart(mode: str, slot: int, save: str, ugcpath:str, isAdding:bool, ugcKin
         nOffset2=offsetLocator(playersav,"BA0F4BAF") + 4 # UGC.Food.HowToCallName
         ugcOffsets=list([fOffset1,fOffset2,fOffset3,fOffset4,fOffset5,fOffset6,fOffset7,fOffset8,fOffset9,fOffset10])
         nOffsets=list([nOffset1,nOffset2])
-        vOffset=list([])
+        vOffset=0
     if ugcKind == 1: # Clothes
         fOffset1=offsetLocator(playersav,"C81545FE") + 4 # UGC.Cloth.UgcClothType
         fOffset2=offsetLocator(playersav,"2FB9146D") + 4 # UGC.Cloth.ClothSeasonType
@@ -61,7 +61,8 @@ def ugcStart(mode: str, slot: int, save: str, ugcpath:str, isAdding:bool, ugcKin
         nOffset2=offsetLocator(playersav,"CF9A13EA") + 4 # UGC.Cloth.HowToCallName
         ugcOffsets=list([fOffset1,fOffset2,fOffset3,fOffset4,lOffset1,lOffset2,lOffset3,lOffset4,lOffset5,lOffset6])
         nOffsets=list([nOffset1,nOffset2])
-        vOffset=list([])
+        vOffset=0
+        v2Offset=0
     if ugcKind == 2: # Goods
         ## Anything
         fOffset1=offsetLocator(playersav,"3FAA2222") + 4 # UGC.Goods.UgcGoodsType
@@ -94,10 +95,11 @@ def ugcStart(mode: str, slot: int, save: str, ugcpath:str, isAdding:bool, ugcKin
         nOffset4=offsetLocator(playersav,"A66367EB") + 4 # UGC.Goods.HowToCallGoodsText
         ugcOffsets=list([fOffset1,fOffset2,fOffset3,fOffset7,fOffset8,fOffset9,fOffset10,fOffset11,fOffset12,fOffset13,fOffset14,lOffset1,lOffset2,lOffset3,lOffset4,lOffset5,lOffset6])
         nOffsets=list([nOffset1,nOffset2,nOffset3,nOffset4])
-    shareUGC(mode, slot, save, ugcpath, ugcKind, ugcOffsets,nOffsets, vOffset, isAdding)
+        v2Offset=0
+    shareUGC(mode, slot, save, ugcpath, ugcKind, ugcOffsets,nOffsets, vOffset, v2Offset, isAdding)
     return()
 
-def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffsets:list, nOffsets:list, vOffset:int, isAdding:bool):
+def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffsets:list, nOffsets:list, vOffset:int,v2Offset:int, isAdding:bool):
     ugcType= ugcTypeIndex[ugcKind]
     with open(save + "/Player.sav", "rb") as f:
         playersav = bytearray(f.read())
@@ -105,15 +107,27 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
     EOffset1=offsetLocator(playersav,"F4A39965") + 4 # Food
     EOffset2=offsetLocator(playersav,"AF129C33") + 4 # Cloth
     EOffset3=offsetLocator(playersav,"1A9C00FE") + 4 # Goods
-    ugcEnableOffsets= list([EOffset1,EOffset2,EOffset3])
+    EOffset4=offsetLocator(playersav,"A39744E9") + 4 # Interior
+    EOffset5=offsetLocator(playersav,"F4BEADC2") + 4 # Exterior
+    EOffset6=offsetLocator(playersav,"5951050B") + 4 # MapObject
+    EOffset7=offsetLocator(playersav,"A1126D32") + 4 # MapFloor
+    ugcEnableOffsets= list([EOffset1,EOffset2,EOffset3,EOffset4,EOffset5,EOffset6,EOffset7])
     TOffset1=offsetLocator(playersav,"3558B77F") + 4 # Food
     TOffset2=offsetLocator(playersav,"59BFA9D3") + 4 # Cloth
     TOffset3=offsetLocator(playersav,"70D10A48") + 4 # Goods
-    ugcTexOffsets = list([TOffset1,TOffset2,TOffset3])
+    TOffset4=offsetLocator(playersav,"E7F9D439") + 4 # Interior
+    TOffset5=offsetLocator(playersav,"16227C50") + 4 # Exterior
+    TOffset6=offsetLocator(playersav,"A9C5CFB8") + 4 # MapObject
+    TOffset7=offsetLocator(playersav,"06A7A14C") + 4 # MapFloor
+    ugcTexOffsets = list([TOffset1,TOffset2,TOffset3,TOffset4,TOffset5,TOffset6,TOffset7])
     HOffset1=offsetLocator(playersav,"6D48F8E2") + 4 # Food
     HOffset2=offsetLocator(playersav,"89F25CAC") + 4 # Cloth
     HOffset3=offsetLocator(playersav,"56202100") + 4 # Goods
-    ugcHashOffsets = list([HOffset1,HOffset2,HOffset3])
+    HOffset4=offsetLocator(playersav,"7FEF7F7D") + 4 # Interior
+    HOffset5=offsetLocator(playersav,"38D72795") + 4 # Exterior
+    HOffset6=offsetLocator(playersav,"1B28B170") + 4 # MapObject
+    HOffset7=offsetLocator(playersav,"816D50A3") + 4 # MapFloor
+    ugcHashOffsets = list([HOffset1,HOffset2,HOffset3,HOffset4,HOffset5,HOffset6,HOffset7])
     ugcHashIndex = list([1,3,2])
 
     ## LIST MODE ###################################################################
@@ -181,7 +195,9 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
             playersav[nOffsets[2]+((slot)*64):nOffsets[2]+((slot)*64)+64] = ugc[nameStart+(128*2):nameStart+(128*2)+64]
             playersav[nOffsets[3]+((slot)*128):nOffsets[3]+((slot)*128)+128] = ugc[nameStart+(128*2)+64:nameStart+(128*3)+64]
         if vOffset:
-            playersav[vOffset+((slot)*12):vOffset+((slot)*12)+12] = ugc[nameStart-16:nameStart-4]
+            playersav[vOffset+((slot)*12):vOffset+((slot)*12)+12] = ugc[nameStart-24:nameStart-12]
+        if v2Offset:
+            playersav[vOffset+((slot)*8):vOffset+((slot)*8)+8] = ugc[nameStart-12:nameStart-4]
         print("Personal data replaced!")
 
         with open(save + "/Player.sav", "wb") as f:
@@ -210,7 +226,11 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
         if vOffset:
             vector = playersav[vOffset+((slot)*12):vOffset+((slot)*12)+12]
         else:
-            vector = bytearray()
+            vector = bytearray(12)
+        if v2Offset:
+            vector2 = playersav[vOffset+((slot)*8):vOffset+((slot)*8)+8]
+        else:
+            vector2 = bytearray(8)
         nameSection = bytearray.fromhex('A2 A2 A2 A2')
         canvasSection = bytearray.fromhex('A3 A3 A3 A3')
         ugcSection = bytearray.fromhex('A4 A4 A4 A4')
@@ -237,7 +257,7 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
         with open(save + "/Ugc/Ugc" + ugcFile + "_Thumb.ugctex.zs", "rb") as f:
             thumbtex = bytearray(f.read())
 
-        output = ltdData + ugcData + vector + nameSection + name + pronounce + canvasSection + canvastex + ugcSection + ugctex + thumbSection + thumbtex
+        output = ltdData + ugcData + vector + vector2 + nameSection + name + pronounce + canvasSection + canvastex + ugcSection + ugctex + thumbSection + thumbtex
 
         ## If user didn't give a name, we'll just set the name to their Mii name
         if (ugcpath[-4:] == "auto"):
