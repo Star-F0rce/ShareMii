@@ -129,6 +129,26 @@ def ugcStart(mode: str, slot: int, save: str, ugcpath:str, isAdding:bool, ugcKin
         nOffsets=list([nOffset1,nOffset2])
         vOffset=offsetLocator(playersav,"3C14025E") + 4 # UGC.Goods.BaseColor
         v2Offset=offsetLocator(playersav,"B9D21B4F") + 4 # UGC.Exterior.MaterialTexScale
+    if ugcKind == 5: # MapObject
+        fOffset1=offsetLocator(playersav,"274659D1") + 4 # UGC.MapObject.UgcMaterialType
+        fOffset2=offsetLocator(playersav,"DCE826FC") + 4 # UGC.MapObject.AttrSmellType
+        fOffset3=offsetLocator(playersav,"E04E1E6B") + 4 # UGC.MapObject.AttrLookType
+        fOffset4=offsetLocator(playersav,"056F2F20") + 4 # UGC.MapObject.AttrTouchType
+        fOffset5=offsetLocator(playersav,"BC7D7E30") + 4 # UGC.MapObject.UgcMapObjectType
+        fOffset6=offsetLocator(playersav,"3C2BC52F") + 4 # UGC.MapObject.Size
+        fOffset7=offsetLocator(playersav,"CFFECCC2") + 4 # UGC.MapObject.UvPatternIdx
+        lOffset1=offsetLocator(playersav,"5C15E339") + 4 # UGC.MapObject.EmissionIntensity
+        lOffset2=offsetLocator(playersav,"5EFF5E0E") + 4 # UGC.MapObject.EmissionPattern
+        lOffset3=offsetLocator(playersav,"9838264B") + 4 # UGC.MapObject.IsEmissionNightOnly
+        lOffset4=offsetLocator(playersav,"48778DE6") + 4 # UGC.MapObject.WordAttrCount
+        lOffset5=offsetLocator(playersav,"62AD5137") + 4 # UGC.MapObject.WordAttrGrammaticality
+        lOffset6=offsetLocator(playersav,"D1B3B197") + 4 # UGC.MapObject.Price
+        nOffset1=offsetLocator(playersav,"56F99338") + 4 # UGC.MapObject.Name
+        nOffset2=offsetLocator(playersav,"EE921AE2") + 4 # UGC.MapObject.HowToCallName
+        ugcOffsets=list([fOffset1,fOffset2,fOffset3,fOffset4,fOffset5,fOffset6,fOffset7,lOffset1,lOffset2,lOffset3,lOffset4,lOffset5,lOffset6])
+        nOffsets=list([nOffset1,nOffset2])
+        vOffset=offsetLocator(playersav,"27F2ECDE") + 4 # UGC.MapObject.Scale
+        v2Offset=offsetLocator(playersav,"2F96203B") + 4 # UGC.MapObject.MaterialTexScale
     shareUGC(mode, slot, save, ugcpath, ugcKind, ugcOffsets,nOffsets, vOffset, v2Offset, isAdding)
     return()
 
@@ -161,7 +181,7 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
     HOffset6=offsetLocator(playersav,"1B28B170") + 4 # MapObject
     HOffset7=offsetLocator(playersav,"816D50A3") + 4 # MapFloor
     ugcHashOffsets = list([HOffset1,HOffset2,HOffset3,HOffset4,HOffset5,HOffset6,HOffset7])
-    ugcHashIndex = list([1,3,2,6,7])
+    ugcHashIndex = list([1,3,2,6,7,4,5])
 
     ## LIST MODE ###################################################################
     if mode == "List":
