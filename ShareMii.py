@@ -12,7 +12,7 @@ from pathlib import Path
 from tkinter import filedialog
 from tkinter.scrolledtext import ScrolledText
 from tkinterdnd2 import DND_FILES, TkinterDnD
-from ShareUGC import ShareCloth,ShareFood,shareUGC
+from ShareUGC import ugcStart,shareUGC
 
 majVersion = 3
 minVersion = 2
@@ -467,7 +467,8 @@ def beginProcess():
     file = fileVar.get()
     slot = slotVar.get()
     item = itemVar.get()
-
+    itemList = list(["Mii","Food","Clothing"])
+    item = itemList.index(item) - 1
     isAdding = False
     if slot.split(" - ")[1] == "Add New Item":
         isAdding = True
@@ -481,12 +482,12 @@ def beginProcess():
         file = os.path.join(file,"auto")
 
     if mode != "Export All":
-        if item == "Mii":
+        if item == -1:
             ShareMii(mode, slot, folder, file)
-        if item == "Food":
-            ShareFood(mode, slot, folder, file, isAdding)
-        if item == "Clothing":
-            ShareCloth(mode, slot, folder, file, isAdding)
+        if item == 0:
+            ugcStart(mode, slot, folder, file, isAdding, item)
+        if item == 1:
+            ugcStart(mode, slot, folder, file, isAdding, item)
         getSlots(folder)
     else:
         if not (os.path.isdir(file)):
@@ -501,9 +502,9 @@ def beginProcess():
         if item == "Mii":
             ShareMii(mode, slot, folder, file)
         if item == "Food":
-            ShareFood(mode, slot, folder, file, isAdding)
+            ugcStart(mode, slot, folder, file, isAdding)
         if item == "Clothing":
-            ShareCloth(mode, slot, folder, file, isAdding)
+            ugcStart(mode, slot, folder, file, isAdding)
 
 ##GUI Setup
 root = TkinterDnD.Tk()

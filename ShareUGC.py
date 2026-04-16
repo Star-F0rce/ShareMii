@@ -18,70 +18,49 @@ def offsetLocator(file, hashStr):
 ugcTypeString = list(["Food","Clothing"])
 ugcTypeIndex = list(["Food","Cloth"])
 
-def ShareFood(mode: str, slot: int, save: str, ugcpath:str, isAdding:bool):
+def ugcStart(mode: str, slot: int, save: str, ugcpath:str, isAdding:bool, ugcKind:int):
 
-    ugcKind=0
 
     with open(save + "/Player.sav", "rb") as f:
         playersav = bytearray(f.read())
-    
-    if mode == "Import":
-        with open(ugcpath, "rb") as f:
-            ugc = bytearray(f.read())
-        if ugc[0] != 0:
-            raise RuntimeError(str("Incorrect ugcType found. Expected " + ugcTypeString[0] +", got " + ugcTypeString[ugc[0]]))
 
     slot -= 1
 
-    ## Offsets
-    fOffset1=offsetLocator(playersav,"307FEEFA") + 4 # UGC.Food.AttrTaste
-    fOffset2=offsetLocator(playersav,"6F93FFBD") + 4 # UGC.Food.AttrType
-    fOffset3=offsetLocator(playersav,"5CA9336E") + 4 # UGC.Food.Temperature
-    fOffset4=offsetLocator(playersav,"F768620A") + 4 # UGC.Food.BaseScale
-    fOffset5=offsetLocator(playersav,"5AF04BEB") + 4 # UGC.Food.EmissionIntensity
-    fOffset6=offsetLocator(playersav,"2DB168C5") + 4 # UGC.Food.EmissionPattern
-    fOffset7=offsetLocator(playersav,"634800AE") + 4 # UGC.Food.IsEmissionNightOnly
-    fOffset8=offsetLocator(playersav,"DD8D6C5A") + 4 # UGC.Food.WordAttrCount
-    fOffset9=offsetLocator(playersav,"AF1186CF") + 4 # UGC.Food.WordAttrGrammaticality
-    fOffset10=offsetLocator(playersav,"58E6AAD3") + 4 # UGC.Food.Price
-    nOffset1=offsetLocator(playersav,"408494F5") + 4 # UGC.Food.Name
-    nOffset2=offsetLocator(playersav,"BA0F4BAF") + 4 # UGC.Food.HowToCallName
-    ugcOffsets=list([fOffset1,fOffset2,fOffset3,fOffset4,fOffset5,fOffset6,fOffset7,fOffset8,fOffset9,fOffset10])
-    EOffset=offsetLocator(playersav,"307FEEFA")
-    nOffsets=list([nOffset1,nOffset2])
-    shareUGC(mode, slot, save, ugcpath, ugcKind, ugcOffsets,nOffsets, isAdding)
-    return()
-
-def ShareCloth(mode: str, slot: int, save: str, ugcpath:str, isAdding:bool):
-
-    ugcKind=1
-
-    with open(save + "/Player.sav", "rb") as f:
-        playersav = bytearray(f.read())
-    
     if mode == "Import":
         with open(ugcpath, "rb") as f:
             ugc = bytearray(f.read())
         if ugc[0] != ugcKind:
             raise RuntimeError(str("Incorrect ugcType found. Expected " + ugcTypeString[ugcKind] +", got " + ugcTypeString[ugc[0]]))
-
-    slot -= 1
-
-    ## Offsets
-    fOffset1=offsetLocator(playersav,"C81545FE") + 4 # UGC.Cloth.UgcClothType
-    fOffset2=offsetLocator(playersav,"2FB9146D") + 4 # UGC.Cloth.ClothSeasonType
-    fOffset3=offsetLocator(playersav,"7A31EF97") + 4 # UGC.Cloth.UgcClothGenreType
-    fOffset4=offsetLocator(playersav,"7EEC35E9") + 4 # UGC.Cloth.ClothGender
-    lOffset1=offsetLocator(playersav,"5E32FD3F") + 4 # UGC.Cloth.EmissionIntensity
-    lOffset2=offsetLocator(playersav,"0DBABE27") + 4 # UGC.Cloth.EmissionPattern
-    lOffset3=offsetLocator(playersav,"71621C98") + 4 # UGC.Cloth.IsEmissionNightOnly
-    lOffset4=offsetLocator(playersav,"2D271339") + 4 # UGC.Cloth.WordAttrCount
-    lOffset5=offsetLocator(playersav,"CDF31EB5") + 4 # UGC.Cloth.WordAttrGrammaticality
-    lOffset6=offsetLocator(playersav,"2823DBD3") + 4 # UGC.Cloth.Price
-    nOffset1=offsetLocator(playersav,"40710642") + 4 # UGC.Cloth.Name
-    nOffset2=offsetLocator(playersav,"CF9A13EA") + 4 # UGC.Cloth.HowToCallName
-    ugcOffsets=list([fOffset1,fOffset2,fOffset3,fOffset4,lOffset1,lOffset2,lOffset3,lOffset4,lOffset5,lOffset6])
-    nOffsets=list([nOffset1,nOffset2])
+    if ugcKind == 0: # Food
+        fOffset1=offsetLocator(playersav,"307FEEFA") + 4 # UGC.Food.AttrTaste
+        fOffset2=offsetLocator(playersav,"6F93FFBD") + 4 # UGC.Food.AttrType
+        fOffset3=offsetLocator(playersav,"5CA9336E") + 4 # UGC.Food.Temperature
+        fOffset4=offsetLocator(playersav,"F768620A") + 4 # UGC.Food.BaseScale
+        fOffset5=offsetLocator(playersav,"5AF04BEB") + 4 # UGC.Food.EmissionIntensity
+        fOffset6=offsetLocator(playersav,"2DB168C5") + 4 # UGC.Food.EmissionPattern
+        fOffset7=offsetLocator(playersav,"634800AE") + 4 # UGC.Food.IsEmissionNightOnly
+        fOffset8=offsetLocator(playersav,"DD8D6C5A") + 4 # UGC.Food.WordAttrCount
+        fOffset9=offsetLocator(playersav,"AF1186CF") + 4 # UGC.Food.WordAttrGrammaticality
+        fOffset10=offsetLocator(playersav,"58E6AAD3") + 4 # UGC.Food.Price
+        nOffset1=offsetLocator(playersav,"408494F5") + 4 # UGC.Food.Name
+        nOffset2=offsetLocator(playersav,"BA0F4BAF") + 4 # UGC.Food.HowToCallName
+        ugcOffsets=list([fOffset1,fOffset2,fOffset3,fOffset4,fOffset5,fOffset6,fOffset7,fOffset8,fOffset9,fOffset10])
+        nOffsets=list([nOffset1,nOffset2])
+    if ugcKind == 1: # Clothes
+        fOffset1=offsetLocator(playersav,"C81545FE") + 4 # UGC.Cloth.UgcClothType
+        fOffset2=offsetLocator(playersav,"2FB9146D") + 4 # UGC.Cloth.ClothSeasonType
+        fOffset3=offsetLocator(playersav,"7A31EF97") + 4 # UGC.Cloth.UgcClothGenreType
+        fOffset4=offsetLocator(playersav,"7EEC35E9") + 4 # UGC.Cloth.ClothGender
+        lOffset1=offsetLocator(playersav,"5E32FD3F") + 4 # UGC.Cloth.EmissionIntensity
+        lOffset2=offsetLocator(playersav,"0DBABE27") + 4 # UGC.Cloth.EmissionPattern
+        lOffset3=offsetLocator(playersav,"71621C98") + 4 # UGC.Cloth.IsEmissionNightOnly
+        lOffset4=offsetLocator(playersav,"2D271339") + 4 # UGC.Cloth.WordAttrCount
+        lOffset5=offsetLocator(playersav,"CDF31EB5") + 4 # UGC.Cloth.WordAttrGrammaticality
+        lOffset6=offsetLocator(playersav,"2823DBD3") + 4 # UGC.Cloth.Price
+        nOffset1=offsetLocator(playersav,"40710642") + 4 # UGC.Cloth.Name
+        nOffset2=offsetLocator(playersav,"CF9A13EA") + 4 # UGC.Cloth.HowToCallName
+        ugcOffsets=list([fOffset1,fOffset2,fOffset3,fOffset4,lOffset1,lOffset2,lOffset3,lOffset4,lOffset5,lOffset6])
+        nOffsets=list([nOffset1,nOffset2])
     shareUGC(mode, slot, save, ugcpath, ugcKind, ugcOffsets,nOffsets, isAdding)
     return()
 
