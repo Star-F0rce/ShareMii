@@ -111,6 +111,24 @@ def ugcStart(mode: str, slot: int, save: str, ugcpath:str, isAdding:bool, ugcKin
         nOffsets=list([nOffset1,nOffset2])
         vOffset=0
         v2Offset=0
+    if ugcKind == 4: # Exterior
+        fOffset1=offsetLocator(playersav,"ED95CF0F") + 4 # UGC.Exterior.UgcMaterialType
+        fOffset2=offsetLocator(playersav,"43F509BA") + 4 # UGC.Exterior.UgcImpressionType
+        fOffset3=offsetLocator(playersav,"A7A0773C") + 4 # UGC.Exterior.UgcMapObjectType
+        fOffset4=offsetLocator(playersav,"A7A0773C") + 4 # UGC.Exterior.Size
+        fOffset5=offsetLocator(playersav,"34BA6119") + 4 # UGC.Exterior.UvPatternIdx
+        lOffset1=offsetLocator(playersav,"5E6E9F8C") + 4 # UGC.Exterior.EmissionIntensity
+        lOffset2=offsetLocator(playersav,"2907C040") + 4 # UGC.Exterior.EmissionPattern
+        lOffset3=offsetLocator(playersav,"97865D6B") + 4 # UGC.Exterior.IsEmissionNightOnly
+        lOffset4=offsetLocator(playersav,"609F197D") + 4 # UGC.Exterior.WordAttrCount
+        lOffset5=offsetLocator(playersav,"47A50525") + 4 # UGC.Exterior.WordAttrGrammaticality
+        lOffset6=offsetLocator(playersav,"71EA7734") + 4 # UGC.Exterior.Price
+        nOffset1=offsetLocator(playersav,"27C875D6") + 4 # UGC.Exterior.Name
+        nOffset2=offsetLocator(playersav,"0E15E3F8") + 4 # UGC.Exterior.HowToCallName
+        ugcOffsets=list([fOffset1,fOffset2,fOffset3,fOffset4,fOffset5,lOffset1,lOffset2,lOffset3,lOffset4,lOffset5,lOffset6])
+        nOffsets=list([nOffset1,nOffset2])
+        vOffset=offsetLocator(playersav,"3C14025E") + 4 # UGC.Goods.BaseColor
+        v2Offset=offsetLocator(playersav,"B9D21B4F") + 4 # UGC.Exterior.MaterialTexScale
     shareUGC(mode, slot, save, ugcpath, ugcKind, ugcOffsets,nOffsets, vOffset, v2Offset, isAdding)
     return()
 
@@ -143,7 +161,7 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
     HOffset6=offsetLocator(playersav,"1B28B170") + 4 # MapObject
     HOffset7=offsetLocator(playersav,"816D50A3") + 4 # MapFloor
     ugcHashOffsets = list([HOffset1,HOffset2,HOffset3,HOffset4,HOffset5,HOffset6,HOffset7])
-    ugcHashIndex = list([1,3,2,6])
+    ugcHashIndex = list([1,3,2,6,7])
 
     ## LIST MODE ###################################################################
     if mode == "List":
