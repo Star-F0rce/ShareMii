@@ -46,6 +46,7 @@ def ugcStart(mode: str, slot: int, save: str, ugcpath:str, isAdding:bool, ugcKin
         ugcOffsets=list([fOffset1,fOffset2,fOffset3,fOffset4,fOffset5,fOffset6,fOffset7,fOffset8,fOffset9,fOffset10])
         nOffsets=list([nOffset1,nOffset2])
         vOffset=0
+        v2Offset=0
     if ugcKind == 1: # Clothes
         fOffset1=offsetLocator(playersav,"C81545FE") + 4 # UGC.Cloth.UgcClothType
         fOffset2=offsetLocator(playersav,"2FB9146D") + 4 # UGC.Cloth.ClothSeasonType
@@ -225,7 +226,7 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
                 raise RuntimeError("This item is not the same subtype as what you're importing! Find the same type or add the item.")
             
         if (ugcKind in range(4,5)) & (isAdding == False):
-            raise RuntimeError("You can only add Exterior and Objects. Please use the add slot.")
+            raise RuntimeError("You can only add Exterior and Objects, not replace. Please use the add slot.")
 
         #Find where block files begin
         nameStart = ugc.find(bytes.fromhex("A2 A2 A2 A2")) + 4

@@ -16,7 +16,7 @@ from ShareUGC import ugcStart,shareUGC
 
 majVersion = 3
 minVersion = 2
-preVersion = 0
+preVersion = 1
 if preVersion:
     preVersion = str(".pre" + str(preVersion))
 else:
@@ -546,7 +546,7 @@ folderEntry.grid(row=3, column=1, padx=5, pady=5,sticky=tk.NSEW)
 browseButton = ttk.Button(root, text="Browse...", width=12, command=browseFolder).grid(row=3, column=2, padx=3, pady=3, sticky=tk.W)
 
 ## Row 4
-ttk.Label(root, text="Open/Save As Mii:").grid(row=4, column=0, padx=5, pady=5, sticky=tk.E)
+ttk.Label(root, text="Open/Save As File:").grid(row=4, column=0, padx=5, pady=5, sticky=tk.E)
 fileEntry = ttk.Entry(root, textvariable=fileVar, width=50)
 fileEntry.drop_target_register(DND_FILES)
 fileEntry.dnd_bind('<<Drop>>',dragndrop)
