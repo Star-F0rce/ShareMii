@@ -96,6 +96,21 @@ def ugcStart(mode: str, slot: int, save: str, ugcpath:str, isAdding:bool, ugcKin
         ugcOffsets=list([fOffset1,fOffset2,fOffset3,fOffset7,fOffset8,fOffset9,fOffset10,fOffset11,fOffset12,fOffset13,fOffset14,lOffset1,lOffset2,lOffset3,lOffset4,lOffset5,lOffset6])
         nOffsets=list([nOffset1,nOffset2,nOffset3,nOffset4])
         v2Offset=0
+    if ugcKind == 3: # Interior
+        fOffset1=offsetLocator(playersav,"A9116402") + 4 # UGC.Interior.UgcInteriorMaterialType
+        fOffset2=offsetLocator(playersav,"835114C1") + 4 # UGC.Interior.UgcImpressionType
+        lOffset1=offsetLocator(playersav,"EC65E2E4") + 4 # UGC.Interior.EmissionIntensity
+        lOffset2=offsetLocator(playersav,"0A7CF2C5") + 4 # UGC.Interior.EmissionPattern
+        lOffset3=offsetLocator(playersav,"60E280FB") + 4 # UGC.Interior.IsEmissionNightOnly
+        lOffset4=offsetLocator(playersav,"01B3661E") + 4 # UGC.Interior.WordAttrCount
+        lOffset5=offsetLocator(playersav,"5AF4A09F") + 4 # UGC.Interior.WordAttrGrammaticality
+        lOffset6=offsetLocator(playersav,"41FF2201") + 4 # UGC.Interior.Price
+        nOffset1=offsetLocator(playersav,"3DE2C5DD") + 4 # UGC.Interior.Name
+        nOffset2=offsetLocator(playersav,"85A37B90") + 4 # UGC.Interior.HowToCallName
+        ugcOffsets=list([fOffset1,fOffset2,lOffset1,lOffset2,lOffset3,lOffset4,lOffset5,lOffset6])
+        nOffsets=list([nOffset1,nOffset2])
+        vOffset=0
+        v2Offset=0
     shareUGC(mode, slot, save, ugcpath, ugcKind, ugcOffsets,nOffsets, vOffset, v2Offset, isAdding)
     return()
 
@@ -128,7 +143,7 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
     HOffset6=offsetLocator(playersav,"1B28B170") + 4 # MapObject
     HOffset7=offsetLocator(playersav,"816D50A3") + 4 # MapFloor
     ugcHashOffsets = list([HOffset1,HOffset2,HOffset3,HOffset4,HOffset5,HOffset6,HOffset7])
-    ugcHashIndex = list([1,3,2])
+    ugcHashIndex = list([1,3,2,6])
 
     ## LIST MODE ###################################################################
     if mode == "List":
