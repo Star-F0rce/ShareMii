@@ -159,11 +159,6 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
     with open(save + "/Player.sav", "rb") as f:
         playersav = bytearray(f.read())
 
-    miiLocation = save + "/Mii.sav"
-    playerLocation = save + "/Player.sav"
-
-    #Ensure the slots match in-game
-
     # Offsets
     fpOffset1=offsetLocator(playersav,"4C9819E4") + 4 # UGC.Facepaint.Price
     fpOffset2=offsetLocator(playersav,"DECC8954") + 4 # UGC.Facepaint.TextureSourceType
@@ -513,7 +508,7 @@ def beginProcess():
 
 ##GUI Setup
 root = TkinterDnD.Tk()
-root.title("ShareMii v" + versionStr + " GUI")
+root.title("ShareMii v" + versionStr)
 root.iconphoto(False, tk.PhotoImage(file=resourcePath("icon.png")))
 root.geometry("800x500")
 root.rowconfigure(6, weight=1)
