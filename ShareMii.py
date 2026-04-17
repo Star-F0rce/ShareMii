@@ -258,7 +258,7 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str, backup:bool = True):
                 os.mkdir(r"./backup")
             backuppath = "./backup"
 
-            shutil.copytree(save,backuppath + "/" + datetime.now().strftime("SaveData_Backup_%d_%m_%Y%_%H%M%S"))
+            shutil.copytree(save,backuppath + "/" + datetime.now().strftime("SaveData_Backup_%d_%m_%Y_%H%M%S"))
 
         # Import the args
         with open(miipath, "rb") as f:
