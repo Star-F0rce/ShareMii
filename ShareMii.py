@@ -266,7 +266,7 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str, backup:bool = True):
 
         if mii == bytearray():
             raise RuntimeError("This Mii is empty!") # Did you try looking under the tray?
-        if mii[0] not in range(1,3):
+        if mii[0] not in range(1,4):
             raise RuntimeError("Incorrect version found. Expected 1-3, got" + str(mii[0]))
 
         ## CONVERSION
