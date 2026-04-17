@@ -474,7 +474,7 @@ def beginProcess():
     if slot.split(" - ")[1] == "Add New Item":
         isAdding = True
     slot = int(slot.split(" - ")[0])
-    if (mode != "Import") & (isAdding == True):
+    if (mode == "Export" or mode =="Export All") & (isAdding == True):
         raise RuntimeError("You can't use this slot with this mode.")
 
     if (file == "Drag & drop or choose Mii here") & (mode == "Export"):
