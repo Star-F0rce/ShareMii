@@ -314,8 +314,16 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str, backup:bool = True):
 
         ## FACEPAINT ##
 
-        #First we need to get the facepaint ID
-        facepaintID=miisav[miiOffset2+4*(slot)]
+        if slot == -1:
+            # The Temp slot (slot -1) uses facepaint ID 70. 
+            # check Player.sav to see if Facepaint 70 is currently active.
+            paintindex = fpOffset3 + 4 * 70
+            if playersav[paintindex:paintindex+4] != bytearray.fromhex('A5 8A FF AF'):
+                facepaintID = 70
+            else:
+                facepaintID = 255
+        else:
+            facepaintID = miisav[miiOffset2+4*(slot)]
 
         #If we detected facepaint earlier, we should copy it into the save file
         if facepaint:
@@ -371,7 +379,9 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str, backup:bool = True):
         else:
             if facepaintID != 255:
                 print("This new Mii no longer uses facepaint. Be sure to back up the old facepaint if you still want it.")
-                miisav[miiOffset2+4*(slot):miiOffset2+4*(slot)+4] = bytearray.fromhex('FF FF FF FF')
+                if slot != -1:
+                    miisav[miiOffset2+4*(slot):miiOffset2+4*(slot)+4] = bytearray.fromhex('FF FF FF FF')
+                
                 playersav[fpOffset1+4*(facepaintID ):fpOffset1+4*(facepaintID )+4] = bytearray.fromhex('00 00 00 00')
                 playersav[fpOffset2+4*(facepaintID ):fpOffset2+4*(facepaintID )+4] = bytearray.fromhex('09 DE EE B6')
                 playersav[fpOffset3+4*(facepaintID ):fpOffset3+4*(facepaintID )+4] = bytearray.fromhex('A5 8A FF AF')
