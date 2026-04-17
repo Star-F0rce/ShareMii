@@ -1,4 +1,5 @@
 import argparse
+from datetime import datetime 
 import os
 import shutil
 import sys
@@ -35,6 +36,44 @@ class TextRedirector():
 
     def flush(self):
         pass
+
+## used to add hover tooltips to ttinker widgets
+class CreateToolTip(object):
+    def __init__(self, widget, text='widget info'):
+        self.widget = widget
+        self.text = text
+        self.tooltip_window = None
+        # Bind the mouse enter and mouse leave events
+        self.widget.bind("<Enter>", self.show_tooltip)
+        self.widget.bind("<Leave>", self.hide_tooltip)
+
+    def show_tooltip(self, event=None):
+        # Prevent multiple tooltips from spawning
+        if self.tooltip_window or not self.text:
+            return
+        
+        # Calculate the coordinates so it appears right below the widget
+        x = self.widget.winfo_rootx() + 25
+        y = self.widget.winfo_rooty() + self.widget.winfo_height() + 5
+
+        # Create a Toplevel window with no borders/decorations
+        self.tooltip_window = tk.Toplevel(self.widget)
+        self.tooltip_window.wm_overrideredirect(True)
+        self.tooltip_window.wm_geometry(f"+{x}+{y}")
+        self.tooltip_window.attributes("-alpha", 0.85)
+
+        # Create the visual label for the tooltip
+        label = tk.Label(self.tooltip_window, text=self.text, justify='left',
+                         background="#2b2b2b", foreground="#ffffff", 
+                         relief='solid', borderwidth=1,
+                         font=("Arial", "9", "normal"), padx=5, pady=3)
+        label.pack()
+
+    def hide_tooltip(self, event=None):
+        # Destroy the tooltip window when the mouse leaves
+        if self.tooltip_window:
+            self.tooltip_window.destroy()
+            self.tooltip_window = None
 
 ## Used for GUI icon
 def resourcePath(relativePath):
@@ -133,6 +172,7 @@ mode_group.add_argument("-l", action="store_true", help="List Miis")
 mode_group.add_argument("-i",metavar="Mii.ltd",type=str,help="Import Mii.ltd")
 mode_group.add_argument("-o",metavar="Name",type=str,help="Export Mii to Name.ltd")
 mode_group.add_argument("-a",metavar="Directory",type=str,help="Export all Miis to directory")
+parser.add_argument("--backup", action="store_true", help="Create Backupfolder of Savedata")
 parser.add_argument("save", type=str, help="save folder location", nargs="?")
 parser.add_argument("slot", type=int, help="Mii slot to import/export", nargs="?")
 
@@ -141,7 +181,7 @@ args = parser.parse_args()
 ugcTypeString = list(["Food","Clothing","Treasure","Interior","Exterior","Objects","Landscaping"])
 ugcTypeIndex = list(["Food","Cloth","Goods","Interior","Exterior","MapObject","MapFloor"])
 
-def ShareMii(mode: str, slot: int, save: str, miipath:str):
+def ShareMii(mode: str, slot: int, save: str, miipath:str, backup:bool = True):
 
     if mode == "List":
         slot = 1
@@ -211,13 +251,22 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str):
 
     ## IMPORT MODE #################################################################
     if mode == "Import":
+
+        # Backup Save DATA
+        if backup:
+            if not os.path.exists(r"./backup"):
+                os.mkdir(r"./backup")
+            backuppath = "./backup"
+
+            shutil.copytree(save,backuppath + "/" + datetime.now().strftime("SaveData_Backup_%d_%m_%Y%_%H%M%S"))
+
         # Import the args
         with open(miipath, "rb") as f:
             mii = bytearray(f.read())
 
         if mii == bytearray():
             raise RuntimeError("This Mii is empty!") # Did you try looking under the tray?
-        if mii[0] not in range(1,3):
+        if mii[0] not in range(1,4):
             raise RuntimeError("Incorrect version found. Expected 1-3, got" + str(mii[0]))
 
         ## CONVERSION
@@ -468,6 +517,7 @@ def beginProcess():
     file = fileVar.get()
     slot = slotVar.get()
     item = itemVar.get()
+    backup = backupVar.get()
     itemList = list(["Mii","Food","Clothing","Treasure","Interior","Exterior","Objects","Landscaping"])
     item = itemList.index(item) - 1
     isAdding = False
@@ -484,7 +534,7 @@ def beginProcess():
 
     if mode != "Export All":
         if item == -1:
-            ShareMii(mode, slot, folder, file)
+            ShareMii(mode, slot, folder, file, backup)
         else:
             ugcStart(mode, slot, folder, file, isAdding, item)
         getSlots(folder)
@@ -502,7 +552,7 @@ def beginProcess():
             slot = names[x]
             slot = int(slot.split(" - ")[0])
             if item == "-1":
-                ShareMii(mode, slot, folder, file)
+                ShareMii(mode, slot, folder, file, backup)
             else:
                 ugcStart(mode, slot, folder, file, isAdding, item)
 
@@ -510,8 +560,8 @@ def beginProcess():
 root = TkinterDnD.Tk()
 root.title("ShareMii v" + versionStr)
 root.iconphoto(False, tk.PhotoImage(file=resourcePath("icon.png")))
-root.geometry("800x500")
-root.rowconfigure(6, weight=1)
+root.geometry("800x550")
+root.rowconfigure(8, weight=1)
 root.columnconfigure(0, weight=1)
 root.columnconfigure(1, weight=1)
 root.columnconfigure(2, weight=1)
@@ -558,12 +608,25 @@ slotEntry = ttk.Combobox(root, textvariable=slotVar, state="readonly")
 slotEntry.grid(row=5, column=1, padx=5, pady=5, sticky=tk.W)
 slotEntry["values"]=list(range(0, 71))
 
-## Row 6
-startButton = ttk.Button(root, text="Start!", command=beginProcess, width=20).grid(row=6, column=1, padx=5, pady=5)
+# Row 6
+backup_frame = ttk.Frame(root)
+backup_frame.grid(row=6, column=1, sticky=tk.W)
+
+ttk.Label(root, text="Enable Backup:").grid(row=6, column=0, padx=5, pady=5, sticky=tk.E)
+backupVar = tk.BooleanVar(value=True)
+backup_cb = ttk.Checkbutton(backup_frame, variable=backupVar)
+backup_cb.pack(side=tk.LEFT)
+
+info_icon = ttk.Label(backup_frame, text="\u24D8", foreground="gray", cursor="question_arrow")
+info_icon.pack(side=tk.LEFT, padx=(5, 0))
+CreateToolTip(info_icon, "Check this to create a save backup Folder of your Game Save data before Importing\n\n IMPORT MODE ONLY\n\nFOLDER LOCATION: \n<app_root_folder>/backup/SaveData_Backup_<Day_Mont_Year_HourMinuteSecond>")
 
 ## Row 7
+startButton = ttk.Button(root, text="Start!", command=beginProcess, width=20).grid(row=7, column=1, padx=5, pady=5)
+
+## Row 8
 guiOutput = ScrolledText(root,height=10,width=40)
-guiOutput.grid(row=7, column=1,sticky=tk.NSEW)
+guiOutput.grid(row=8, column=1,sticky=tk.NSEW)
 
 sv_ttk.set_theme(darkdetect.theme())
 
@@ -651,6 +714,15 @@ def getSlots(folder):
             filledSlots.append(NewSlot)
     updateSlots(filledSlots)
 
+def updateBackupState(*args):
+    if modeVar.get() == "Import":
+        backup_cb.state(['!disabled']) 
+    else:
+        backup_cb.state(['disabled'])
+
+modeVar.trace_add("write", updateBackupState)
+updateBackupState()
+
 itemVar.trace_add(
     "write",
     lambda *args: getSlots(folderVar.get())
@@ -666,7 +738,7 @@ if args.l:
 if args.i:
     modeVar = "Import"
     fileVar = args.i
-    ShareMii(modeVar,args.slot,args.save,fileVar)
+    ShareMii(modeVar,args.slot,args.save,fileVar, args.backup)
     sys.exit(0)
 if args.o:
     modeVar = "Export"
