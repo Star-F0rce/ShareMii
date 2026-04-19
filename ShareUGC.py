@@ -260,7 +260,7 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
 
         ## UGC data ##
         if isAdding == True:
-            print("Adding UGC data to " + str(ugcTypeString[ugcKind]) + " slot " + slot)
+            print("Adding UGC data to " + str(ugcTypeString[ugcKind]) + " slot " + str(slot))
         else:
             print("Replacing UGC data...")
         # Apply personality changes
