@@ -237,7 +237,7 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
             raise RuntimeError("You can only add Exterior and Objects, not replace. Please use the add slot.")
         
         #Verify the header of nameStart to make sure the file is valid
-        if (ugc[nameStart-4,nameStart] != bytearray.fromhex("A2 A2 A2 A2")):
+        if (ugc[nameStart-4:nameStart] != bytearray.fromhex("A2 A2 A2 A2")):
             raise RuntimeError("Invalid header! Are you sure this is a valid file?")
 
 
@@ -254,12 +254,15 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
             f.write(ugc[ugcStart:thumbStart - 4])
         with open(save + "/Ugc/Ugc" + ugcFile + "_Thumb.ugctex.zs", "wb") as f:
             f.write(ugc[thumbStart:])
-        print("UGC successfully copied to " + save + "/Ugc/Ugc" + ugcFile)
+        print("UGC textures successfully copied to " + save + "/Ugc/Ugc" + ugcFile)
 
         ## TEXTURES END ##
 
         ## UGC data ##
-        print("Replacing UGC data...")
+        if isAdding == True:
+            print("Adding UGC data to " + str(ugcTypeString[ugcKind]) + " slot " + slot)
+        else:
+            print("Replacing UGC data...")
         # Apply personality changes
         for x in range(len(ugcOffsets)):
             playersav[ugcOffsets[x]+(slot)*4:ugcOffsets[x]+(slot)*4+4] = ugc[4+x*4:4+x*4+4]
@@ -278,7 +281,10 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
             playersav[vOffset+((slot)*12):vOffset+((slot)*12)+12] = ugc[nameStart-24:nameStart-12]
         if v2Offset:
             playersav[vOffset+((slot)*8):vOffset+((slot)*8)+8] = ugc[nameStart-12:nameStart-4]
-        print("Personal data replaced!")
+        if isAdding == True:
+            print("Item data added!")
+        else:
+            print("Item data replaced!")
 
         with open(save + "/Player.sav", "wb") as f:
             f.write(playersav)

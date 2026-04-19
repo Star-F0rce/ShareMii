@@ -17,7 +17,7 @@ from ShareUGC import ugcStart,shareUGC
 
 majVersion = 3
 minVersion = 2
-preVersion = 3
+preVersion = 0
 if preVersion:
     preVersion = str(".pre" + str(preVersion))
 else:
@@ -537,7 +537,7 @@ def beginProcess():
     if (mode == "Export" or mode =="Export All") & (isAdding == True):
         raise RuntimeError("You can't use this slot with this mode.")
 
-    if (file == "Drag & drop or choose Mii here") & (mode == "Export"):
+    if (file == "Drag & drop or upload .ltd(x) here") & (mode == "Export"):
         file = "auto"
     if (os.path.isdir(file)) & (mode == "Export"):
         file = os.path.join(file,"auto")
@@ -582,7 +582,7 @@ modeVar=tk.StringVar()
 itemVar=tk.StringVar()
 slotVar=tk.StringVar(value="1")
 folderVar=tk.StringVar(value="Drag & drop or upload save folder here")
-fileVar=tk.StringVar(value="Drag & drop or choose Mii here")
+fileVar=tk.StringVar(value="Drag & drop or upload .ltd(x) here")
 
 ## Row 0
 logo = tk.PhotoImage(file=resourcePath("logo.png"))
