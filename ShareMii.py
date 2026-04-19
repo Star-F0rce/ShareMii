@@ -261,7 +261,19 @@ def swizzle(data: bytes, width: int, height: int, bpp: int = 4) -> bytes:
 # ── Texture sizes ─────────────────────────────────────────────────────────────
 UGCTEX_W, UGCTEX_H = 256, 128   # rendered texture on face
 CANVAS_W, CANVAS_H = 256, 256   # editable stroke canvas
-## END of Facepaint fucntions
+DUMMY_MII_DATA = bytearray.fromhex(
+    "03 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 "
+    "4D 00 69 00 69 00 00 00 00 00 00 00 00 00 00 00 "
+    "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 "
+    "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 "
+    "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 "
+    "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 "
+    "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 "
+    "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 "
+    "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 "
+    "00 00 00 00 00 00 00 00 00 00 00 00"
+)
+## END of Facepaint functions
 
 parser = argparse.ArgumentParser(description="ShareMii v" + versionStr +" - Import/Export Living the Dream Miis!")
 
