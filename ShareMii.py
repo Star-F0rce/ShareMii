@@ -44,7 +44,7 @@ _libzstd.ZSTD_isError.argtypes = [ctypes.c_size_t]
 
 majVersion = 3
 minVersion = 2
-preVersion = 1
+preVersion = 2
 if preVersion:
     preVersion = str(".pre" + str(preVersion))
 else:
