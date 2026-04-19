@@ -14,6 +14,33 @@ from tkinter import filedialog
 from tkinter.scrolledtext import ScrolledText
 from tkinterdnd2 import DND_FILES, TkinterDnD
 from ShareUGC import ugcStart,shareUGC
+import ctypes
+from PIL import Image
+
+try:
+    base_path = sys._MEIPASS
+except Exception:
+    base_path = os.path.abspath(os.path.dirname(__file__))
+
+try:
+    if os.name == 'nt': # Windows
+        dll_path = os.path.join(base_path, 'lib', 'libzstd.dll')
+        _libzstd = ctypes.CDLL(dll_path)
+    else: # Linux/Mac
+        _libzstd = ctypes.CDLL('libzstd.so.1')
+except OSError as e:
+    print(f"CRITICAL ERROR: Couldn't find dll make sure 'libzstd.dll' exists in lib folder.")
+    print(f"Path: {dll_path if os.name == 'nt' else so_path}")
+    sys.exit(1)
+
+_libzstd.ZSTD_compress.restype = ctypes.c_size_t
+_libzstd.ZSTD_compress.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.c_void_p, ctypes.c_size_t, ctypes.c_int]
+_libzstd.ZSTD_decompress.restype = ctypes.c_size_t
+_libzstd.ZSTD_decompress.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.c_void_p, ctypes.c_size_t]
+_libzstd.ZSTD_getFrameContentSize.restype = ctypes.c_uint64
+_libzstd.ZSTD_getFrameContentSize.argtypes = [ctypes.c_void_p, ctypes.c_size_t]
+_libzstd.ZSTD_isError.restype = ctypes.c_uint
+_libzstd.ZSTD_isError.argtypes = [ctypes.c_size_t]
 
 majVersion = 3
 minVersion = 2
@@ -116,6 +143,10 @@ def browseFile():
         selectedDirectory = filedialog.asksaveasfilename(defaultextension=fExtensionDef, filetypes=[(fExtensionDesc, fExtensionType)])
     if modeVar.get() == "List":
         selectedDirectory = filedialog.askdirectory()
+    if modeVar.get() == "Export Facepaint":
+        selectedDirectory = filedialog.asksaveasfilename(defaultextension="", filetypes=[("All Files", "*.*"), ("PNG Files", "*.png"), ("No Extension", "*") ])
+    if modeVar.get() == "Import Facepaint":
+        selectedDirectory = filedialog.askopenfilename(defaultextension=[".jpg",".jpeg",".png"], filetypes=[("Image Files", "*.png *.jpg *.jpeg"),("PNG Files", "*.png"),("JPEG Files", "*.jpg *.jpeg"), ("All Files", "*.*")])
     if selectedDirectory:
         fileVar.set(selectedDirectory)
 
@@ -135,7 +166,10 @@ def dragndrop(event):
             itemList = list(["Mii","Food","Clothing","Treasure","Interior","Exterior","Objects","Landscaping"])
             fExtensionDef=[".ltd",".ltdf",".ltdc",".ltdg",".ltdi",".ltde",".ltdo",".ltdl"]
             ext = Path(path).suffix
-            itemVar.set(itemList[fExtensionDef.index(ext)])
+            if ext in fExtensionDef:
+                itemVar.set(itemList[fExtensionDef.index(ext)])
+            elif ext in [".png", ".jpg", ".jpeg"]:
+                modeVar.set("Import Facepaint")
         fileVar.set(path)
 
 def offsetLocator(file, hashStr):
@@ -165,6 +199,70 @@ def EncodeSexuality(bits: list[int]) -> bytearray:
 
     return result
 
+## Facepaint PNG import export functions
+
+def zstd_decompress(data: bytes) -> bytes:
+    src = ctypes.create_string_buffer(data)
+    size = _libzstd.ZSTD_getFrameContentSize(src, len(data))
+    dst = ctypes.create_string_buffer(size)
+    result = _libzstd.ZSTD_decompress(dst, size, src, len(data))
+    if _libzstd.ZSTD_isError(result):
+        raise RuntimeError(f"Zstd decompression failed: result={result}")
+    return bytes(dst.raw[:result])
+ 
+def zstd_compress(data: bytes, level: int = 3) -> bytes:
+    src = ctypes.create_string_buffer(data)
+    max_out = len(data) + 1024
+    dst = ctypes.create_string_buffer(max_out)
+    result = _libzstd.ZSTD_compress(dst, max_out, src, len(data), level)
+    if _libzstd.ZSTD_isError(result):
+        raise RuntimeError(f"Zstd compression failed: result={result}")
+    return bytes(dst.raw[:result])
+ 
+# ── Switch block-linear swizzle ───────────────────────────────────────────────
+# Both ugctex (256x128) and canvas (256x256) use bhl=4 (block_height=16 GOBs)
+BHL = 4  # block_height_log2
+ 
+def _gob_offset(bx, by):
+    return ((bx >> 5) << 8) | ((by >> 1) << 6) | (((bx & 0x1f) >> 4) << 5) | ((by & 1) << 4) | (bx & 0xf)
+ 
+def deswizzle(data: bytes, width: int, height: int, bpp: int = 4) -> bytes:
+    block_height = 1 << BHL
+    output = bytearray(width * height * bpp)
+    block_width_in_gobs = max(1, (width * bpp + 63) // 64)
+    for y in range(height):
+        for x in range(width):
+            gob_x = (x * bpp) // 64
+            gob_y = y // (8 * block_height)
+            block_row = (y % (8 * block_height)) // 8
+            gob_num = (gob_y * block_width_in_gobs + gob_x) * block_height + block_row
+            src = gob_num * 512 + _gob_offset((x * bpp) % 64, y % 8)
+            dst = (y * width + x) * bpp
+            if src + bpp <= len(data) and dst + bpp <= len(output):
+                output[dst:dst+bpp] = data[src:src+bpp]
+    return bytes(output)
+ 
+def swizzle(data: bytes, width: int, height: int, bpp: int = 4) -> bytes:
+    block_height = 1 << BHL
+    output = bytearray(width * height * bpp)
+    block_width_in_gobs = max(1, (width * bpp + 63) // 64)
+    for y in range(height):
+        for x in range(width):
+            gob_x = (x * bpp) // 64
+            gob_y = y // (8 * block_height)
+            block_row = (y % (8 * block_height)) // 8
+            gob_num = (gob_y * block_width_in_gobs + gob_x) * block_height + block_row
+            dst = gob_num * 512 + _gob_offset((x * bpp) % 64, y % 8)
+            src = (y * width + x) * bpp
+            if src + bpp <= len(data) and dst + bpp <= len(output):
+                output[dst:dst+bpp] = data[src:src+bpp]
+    return bytes(output)
+
+# ── Texture sizes ─────────────────────────────────────────────────────────────
+UGCTEX_W, UGCTEX_H = 256, 128   # rendered texture on face
+CANVAS_W, CANVAS_H = 256, 256   # editable stroke canvas
+## END of Facepaint fucntions
+
 parser = argparse.ArgumentParser(description="ShareMii v" + versionStr +" - Import/Export Living the Dream Miis!")
 
 mode_group = parser.add_mutually_exclusive_group(required=False)
@@ -172,6 +270,8 @@ mode_group.add_argument("-l", action="store_true", help="List Miis")
 mode_group.add_argument("-i",metavar="Mii.ltd",type=str,help="Import Mii.ltd")
 mode_group.add_argument("-o",metavar="Name",type=str,help="Export Mii to Name.ltd")
 mode_group.add_argument("-a",metavar="Directory",type=str,help="Export all Miis to directory")
+mode_group.add_argument("--export_fp", metavar="Name", type=str, help="export Mii Facepaint as name.png")
+mode_group.add_argument("--import_fp", metavar="*.png", type=str, help="import *.png as Facepaint onto Mii")
 parser.add_argument("--backup", action="store_true", help="Create Backupfolder of Savedata")
 parser.add_argument("save", type=str, help="save folder location", nargs="?")
 parser.add_argument("slot", type=int, help="Mii slot to import/export", nargs="?")
@@ -520,6 +620,143 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str, backup:bool = True):
 
         print("Success! " + printName.decode("utf-16") + " written to " + miipath)
 
+    ## Export Facepaint Mode
+    if mode == "Export Facepaint":
+        #Read inputs
+
+        #Locate miis in Mii.sav
+        paintindex = fpOffset3 + 4 * (slot)
+        facepaint=False
+
+        #Face paint detection
+        if slot != -1:
+            if miisav[miiOffset2+4*(slot):miiOffset2+4*(slot)+4] != bytearray.fromhex('FF FF FF FF'):
+                facepaint=True
+                facepaintID=miisav[miiOffset2+4*(slot)]
+
+        #Check to see if using Temp Slot
+        if slot == -1:
+            paintindex = fpOffset3 + 4 * 70
+            miiindex = miiOffset3
+            miisav=playersav
+            if playersav[paintindex:paintindex+4] != bytearray.fromhex('A5 8A FF AF'):
+                facepaint=True
+                facepaintID=70
+
+        #Errors
+        if sum(miisav[miiindex:miiindex+156]) == 152:
+            raise RuntimeError("Mii not initialized! Please create a mii in this slot.")
+        if miiindex == -1:
+            raise RuntimeError("Miis not found.")
+
+        if facepaint:
+            if facepaintID < 10:
+                facepaintFile = "00" + str(facepaintID)
+            else:
+                facepaintFile = "0" + str(facepaintID)
+            print("Facepaint detected with ID " + str(facepaintID) +"! Grabbing..")
+            
+            canvastxpth = save + "/Ugc/UgcFacePaint" + facepaintFile + ".canvas.zs"
+            ugctexpth = save + "/Ugc/UgcFacePaint" + facepaintFile + ".ugctex.zs"
+            
+            for kind, w, h, zs_path in [
+                ("ugctex", UGCTEX_W, UGCTEX_H, ugctexpth),
+                ("canvas", CANVAS_W, CANVAS_H, canvastxpth)
+            ]:
+                raw_swizzled = zstd_decompress(open(zs_path, "rb").read())
+                raw_linear   = deswizzle(raw_swizzled, w, h)
+                img = Image.frombytes("RGBA", (w, h), raw_linear)
+                out_path = miipath + f"_{kind}.png"
+                img.save(out_path)
+                print(f"  Exported {out_path}  ({w}x{h})")
+        else:
+            print("Mii has no Facepaint!")
+
+    ## Import Facepaint Mode
+    if mode == "Import Facepaint":
+
+        if sum(miisav[miiindex:miiindex+156]) == 152:
+            print(f"Slot {slot+1} is empty. Initializing with dummy Mii to support Facepaint...")
+            if slot == -1:
+                playersav[miiindex:miiindex+156] = DUMMY_MII_DATA
+            else:
+                miisav[miiindex:miiindex+156] = DUMMY_MII_DATA
+            
+            # Newly created mii's have a savepaint id of 255
+            facepaintID = 255
+        else:
+            if slot == -1:
+                paintindex = fpOffset3 + 4 * 70
+                if playersav[paintindex:paintindex+4] != bytearray.fromhex('A5 8A FF AF'):
+                    facepaintID = 70
+                else:
+                    facepaintID = 255
+            else:
+                facepaintID = miisav[miiOffset2+4*(slot)]
+
+        # Failsafe for when the Mii doesn't have a Facepaint ID so old ones don't get overwritten
+        if facepaintID == 255:
+            usedIDs = bytearray([255] * 70)
+            for x in range(70):
+                if miisav[miiOffset2+4*(x)] != 255:
+                    usedIDs[x] = miisav[miiOffset2+4*(x)]
+            s = set(usedIDs)
+            for i in range(70):
+                if i not in s:
+                    facepaintID = i
+                    break
+
+        if slot == -1:
+            paintindex = fpOffset3 + 4 * 70
+            if playersav[paintindex:paintindex+4] != bytearray.fromhex('A5 8A FF AF'):
+                facepaintID = 70
+            else:
+                facepaintID = 255
+        else:
+            facepaintID = miisav[miiOffset2+4*(slot)]
+            if facepaintID == 255:
+                usedIDs = bytearray([255] * 70)
+                for x in range(70):
+                    if miisav[miiOffset2+4*(x)] != 255:
+                        usedIDs[x] = miisav[miiOffset2+4*(x)]
+                s = set(usedIDs)
+                for i in range(70):
+                    if i not in s:
+                        facepaintID = i
+                        break
+        if slot == -1:
+            facepaintID = 70
+        else:
+            miisav[miiOffset2+4*(slot):miiOffset2+4*(slot)+4] = bytearray([facepaintID, 0, 0, 0])
+        playersav[fpOffset1+4*facepaintID:fpOffset1+4*facepaintID+4] = bytearray.fromhex('F4 01 00 00')
+        playersav[fpOffset2+4*facepaintID:fpOffset2+4*facepaintID+4] = bytearray.fromhex('41 49 93 56')
+        playersav[fpOffset3+4*facepaintID:fpOffset3+4*facepaintID+4] = bytearray.fromhex('F4 AD 7F 1D')
+        playersav[fpOffset4+4*facepaintID:fpOffset4+4*facepaintID+4] = bytearray.fromhex('00 80 00 00')
+        playersav[fpOffset5+4*facepaintID:fpOffset5+4*facepaintID+4] = bytearray([facepaintID, 0, 8, 0])
+
+        # Generate .zs files from PNG and write into Ugc/
+        facepaintFile = str(facepaintID).zfill(3)
+        UgcDir = Path(save + "/Ugc")
+        UgcDir.mkdir(parents=True, exist_ok=True)
+
+        src = Image.open(miipath).convert("RGBA")
+        for kind, w, h in [("ugctex", UGCTEX_W, UGCTEX_H), ("canvas", CANVAS_W, CANVAS_H)]:
+            resized = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+            thumb = src.copy()
+            thumb.thumbnail((w, h), Image.LANCZOS)
+            resized.paste(thumb, ((w - thumb.width) // 2, (h - thumb.height) // 2))
+            compressed = zstd_compress(swizzle(resized.tobytes(), w, h))
+            out = save + "/Ugc/UgcFacePaint" + facepaintFile + f".{kind}.zs"
+            with open(out, "wb") as f:
+                f.write(compressed)
+
+        with open(save + "/Mii.sav", "wb") as f:
+            f.write(miisav)
+        with open(save + "/Player.sav", "wb") as f:
+            f.write(playersav)
+        print(f"Facepaint imported from {miipath} to slot {slot} (ID {facepaintID})")
+
+
 def beginProcess():
     guiOutput.delete("1.0", "end")
     folder = folderVar.get()
@@ -593,8 +830,16 @@ ttk.Label(root, text="Select Item:").grid(row=1, column=0, padx=5, pady=5, stick
 itemEntry = ttk.OptionMenu(root, itemVar,"Mii","Mii","Food","Clothing","Treasure","Interior","Exterior","Objects","Landscaping").grid(row=1, column=1, padx=5, pady=5, sticky=tk.W)
 
 ## Row 2
+info_frame = ttk.Frame(root)
+info_frame.grid(row=2, column=1, sticky=tk.W)
+
+
 ttk.Label(root, text="Select Mode:").grid(row=2, column=0, padx=5, pady=5, sticky=tk.E)
-modeEntry = ttk.OptionMenu(root, modeVar,"List","Import", "Export", "Export All", "List").grid(row=2, column=1, padx=5, pady=5, sticky=tk.W)
+modeEntry = ttk.OptionMenu(info_frame, modeVar,"List","Import", "Export", "Export All", "Import Facepaint", "Export Facepaint", "List")
+modeEntry.pack(side=tk.LEFT, padx=(5,0))
+
+mode_info = ttk.Label(info_frame, text="\u24D8", foreground="gray", cursor="question_arrow")
+mode_info.pack(side=tk.LEFT, padx=(5, 0))
 
 ## Row 3
 ttk.Label(root, text="Select Save Folder:").grid(row=3, column=0, padx=5, pady=5, sticky=tk.E)
@@ -605,12 +850,15 @@ folderEntry.grid(row=3, column=1, padx=5, pady=5,sticky=tk.NSEW)
 browseButton = ttk.Button(root, text="Browse...", width=12, command=browseFolder).grid(row=3, column=2, padx=3, pady=3, sticky=tk.W)
 
 ## Row 4
-ttk.Label(root, text="Open/Save As File:").grid(row=4, column=0, padx=5, pady=5, sticky=tk.E)
+
+fileLabelVar = tk.StringVar(value="Open/Save As File:")
+ttk.Label(root, textvariable=fileLabelVar).grid(row=4, column=0, padx=5, pady=5, sticky=tk.E)
 fileEntry = ttk.Entry(root, textvariable=fileVar, width=50)
 fileEntry.drop_target_register(DND_FILES)
 fileEntry.dnd_bind('<<Drop>>',dragndrop)
 fileEntry.grid(row=4, column=1, padx=5, pady=5,sticky=tk.NSEW)
 browseButton = ttk.Button(root, text="Browse...", width=12, command=browseFile).grid(row=4, column=2, padx=3, pady=3, sticky=tk.W)
+
 
 ## Row 5
 ttk.Label(root, text="Select Slot:").grid(row=5, column=0, padx=5, pady=5, sticky=tk.E)
@@ -725,13 +973,33 @@ def getSlots(folder):
     updateSlots(filledSlots)
 
 def updateBackupState(*args):
-    if modeVar.get() == "Import":
+    current_mode = modeVar.get()
+    if current_mode in ["Import", "Import Facepaint"]:
         backup_cb.state(['!disabled']) 
     else:
         backup_cb.state(['disabled'])
-
 modeVar.trace_add("write", updateBackupState)
 updateBackupState()
+
+def updateFileLabel(*args):
+    mode = modeVar.get()
+    if mode in ["Import Facepaint", "Export Facepaint"]:
+        fileLabelVar.set("Open/Save PNG File:")
+        fileVar.set("Drag & drop or choose PNG here")
+    else:
+        fileLabelVar.set("Open/Save As File:")
+        fileVar.set(value="Drag & drop or choose Mii here")
+modeVar.trace_add("write", updateFileLabel)
+updateFileLabel()
+
+def updateModeInfoIcon(*args):
+    current_mode = modeVar.get()
+    if current_mode == "Import Facepaint":
+        CreateToolTip(mode_info, "You need to enter the Mii editor and Facepaint Mode (Makeup) in Game for the Facepaint to apply correctly")
+    else:
+        CreateToolTip(mode_info, "")
+modeVar.trace_add("write", updateModeInfoIcon)
+updateModeInfoIcon()
 
 itemVar.trace_add(
     "write",
@@ -745,26 +1013,36 @@ if args.l:
     fileVar = 1
     ShareMii(modeVar,args.slot,args.save,fileVar)
     sys.exit(0)
-if args.i:
+elif args.i:
     modeVar = "Import"
     fileVar = args.i
     ShareMii(modeVar,args.slot,args.save,fileVar, args.backup)
     sys.exit(0)
-if args.o:
+elif args.o:
     modeVar = "Export"
     fileVar = args.o
     ShareMii(modeVar,args.slot,args.save,fileVar)
     sys.exit(0)
-if args.a:
+elif args.a:
     fileVar = os.path.join(args.a,"auto")
     modeVar = "Export"
     getSlots(args.save)
     names = slotEntry["values"]
     names = names[1:]
     for x in range(len(names)):
-            slot = names[x]
-            slot = int(slot.split(" - ")[0])
-            ShareMii(modeVar,slot,args.save,fileVar)
+        slot = names[x]
+        slot = int(slot.split(" - ")[0])
+        ShareMii(modeVar,slot,args.save,fileVar)
+    sys.exit(0)
+elif args.export_fp:
+    modeVar = "Export Facepaint"
+    fileVar = args.export_fp
+    ShareMii(modeVar, args.slot, args.save, fileVar)
+    sys.exit(0)
+elif args.import_fp:
+    modeVar = "Import Facepaint"
+    fileVar = args.import_fp 
+    ShareMii(modeVar, args.slot, args.save, fileVar, args.backup)
     sys.exit(0)
 else:
     sys.stdout = TextRedirector(guiOutput)
