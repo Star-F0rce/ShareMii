@@ -17,7 +17,7 @@ from ShareUGC import ugcStart,shareUGC
 
 majVersion = 3
 minVersion = 2
-preVersion = 2
+preVersion = 3
 if preVersion:
     preVersion = str(".pre" + str(preVersion))
 else:
