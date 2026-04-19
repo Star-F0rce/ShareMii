@@ -221,18 +221,25 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
         with open(ugcpath, "rb") as f:
             ugc = bytearray(f.read())
 
-        if (ugcKind in range(1,2)) & (isAdding == False):
-            if playersav[ugcOffsets[0]+(slot)*4:ugcOffsets[0]+(slot)*4+4] != ugc[4:4+4]:
-                raise RuntimeError("This item is not the same subtype as what you're importing! Find the same type or add the item.")
-            
-        if (ugcKind in range(4,5)) & (isAdding == False):
-            raise RuntimeError("You can only add Exterior and Objects, not replace. Please use the add slot.")
-
         #Find where block files begin
         nameStart = ugc.find(bytes.fromhex("A2 A2 A2 A2")) + 4
         canvasStart = ugc.find(bytes.fromhex("A3 A3 A3 A3")) + 4
         ugcStart = ugc.find(bytes.fromhex("A4 A4 A4 A4")) + 4
         thumbStart = ugc.find(bytes.fromhex("A5 A5 A5 A5")) + 4
+
+        #Clothing and Goods need to match types, otherwise they can't be added
+        if (ugcKind in range(1,2)) & (isAdding == False):
+            if playersav[ugcOffsets[0]+(slot)*4:ugcOffsets[0]+(slot)*4+4] != ugc[4:4+4]:
+                raise RuntimeError("This item is not the same subtype as what you're importing! Find the same type or add the item.")
+            
+        #Exterior and Objects can't be replaced, cause that could easily lead to corruption
+        if (ugcKind in range(4,5)) & (isAdding == False):
+            raise RuntimeError("You can only add Exterior and Objects, not replace. Please use the add slot.")
+        
+        #Verify the header of nameStart to make sure the file is valid
+        if (ugc[nameStart-4,nameStart] != bytearray.fromhex("A2 A2 A2 A2")):
+            raise RuntimeError("Invalid header! Are you sure this is a valid file?")
+
 
         ## TEXTURES ##
 
