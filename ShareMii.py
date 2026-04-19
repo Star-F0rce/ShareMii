@@ -17,12 +17,17 @@ from ShareUGC import ugcStart,shareUGC
 
 majVersion = 3
 minVersion = 2
+patchVersion = 0
 preVersion = 0
 if preVersion:
     preVersion = str(".pre" + str(preVersion))
 else:
     preVersion = ""
-versionStr = str(majVersion) + "." + str(minVersion) + preVersion
+if patchVersion:
+    patchVersion = "." + str(patchVersion)
+else:
+    patchVersion = ""
+versionStr = str(majVersion) + "." + str(minVersion) + patchVersion + preVersion
 
 ## This is to output the command line to the GUI
 class TextRedirector():
