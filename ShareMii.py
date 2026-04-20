@@ -97,7 +97,10 @@ def browseFolder():
         folderVar.set(selectedDirectory)
         guiOutput.delete("1.0", "end")
         getSlots(selectedDirectory)
-        slotEntry.current(1)
+        if itemVar.get() != "Mii":
+            slotEntry.current(len(slotEntry["values"]) - 1)
+        else:
+            slotEntry.current(1)
 
 ## Used to browse files in GUI
 def browseFile():
@@ -134,7 +137,10 @@ def dragndrop(event):
         folderVar.set(path)
         guiOutput.delete("1.0", "end")
         getSlots(path)
-        slotEntry.current(1)
+        if itemVar.get() != "Mii":
+            slotEntry.current(len(slotEntry["values"]) - 1)
+        else:
+            slotEntry.current(1)
     else:
         if not (os.path.isdir(path)):
             itemList = list(["Mii","Food","Clothing","Treasure","Interior","Exterior","Objects","Landscaping"])
@@ -650,7 +656,7 @@ def updateSlots(options):
     if itemVar.get() == "Mii":
         slotEntry.current(1)
     else:
-        slotEntry.current(0)
+        slotEntry.current(len(slotEntry["values"]) - 1)
 
 def getSlots(folder): 
     if folderVar.get() == "Drag & drop or upload save folder here":
