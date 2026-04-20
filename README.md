@@ -10,6 +10,9 @@ To use the CLI, run in your terminal: ShareMii [-h] [-l | -i Mii.ltd | -o Name] 
 -i: Import Mode, Imports Mii.ltd into [save], overwriting [slot]\
 -o: Export Mode, Exports Mii from [save] at [slot], into Name.ltd\
 
+## Disclaimer
+ShareMii was made by humans, for humans. Please don't feed this work to an AI. If you want to base your code off this project for another language, that's fine, but please don't use an AI model to do so.
+
 ## Building
 Executables are built with PyInstaller. To build one, clone the repository and run\
 pip install pyinstaller\
