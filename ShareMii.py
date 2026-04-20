@@ -591,7 +591,7 @@ style = ttk.Style(root)
 
 modeVar=tk.StringVar()
 itemVar=tk.StringVar()
-slotVar=tk.StringVar(value="1")
+slotVar=tk.StringVar(value="Save not loaded")
 folderVar=tk.StringVar(value="Drag & drop or upload save folder here")
 fileVar=tk.StringVar(value="Drag & drop or upload .ltd(x) here")
 
@@ -627,7 +627,7 @@ browseButton = ttk.Button(root, text="Browse...", width=12, command=browseFile).
 ttk.Label(root, text="Select Slot:").grid(row=5, column=0, padx=5, pady=5, sticky=tk.E)
 slotEntry = ttk.Combobox(root, textvariable=slotVar, state="readonly")
 slotEntry.grid(row=5, column=1, padx=5, pady=5, sticky=tk.W)
-slotEntry["values"]=list(range(0, 71))
+slotEntry["values"]=list(["Save not loaded"])
 
 # Row 6
 backup_frame = ttk.Frame(root)
@@ -659,7 +659,12 @@ def updateSlots(options):
         slotEntry.current(len(slotEntry["values"]) - 1)
 
 def getSlots(folder): 
+
     if folderVar.get() == "Drag & drop or upload save folder here":
+        return()
+    if folderVar.get() == "":
+        return()
+    if os.path.isfile(folderVar.get()):
         return()
     with open(folder + "/Mii.sav", "rb") as f:
         miisav = bytearray(f.read())
@@ -668,11 +673,12 @@ def getSlots(folder):
         playersav = bytearray(f.read())
 
     item = itemVar.get()
+    filledSlots = []
     if item == "Mii":
         miinames=offsetLocator(miisav,"2499BFDA") + 4
         miiOffset6=offsetLocator(miisav,"881CA27A") + 4
         filledSlots = ["0 - In-Progress Mii"]
-        for x in range(69):
+        for x in range(70):
             miiindex = miiOffset6 + 156 * (x)
             miilistname = miisav[miinames+((x)*64):miinames+((x)*64)+64]
             if sum(miisav[miiindex:miiindex+156]) != 152:
@@ -684,37 +690,30 @@ def getSlots(folder):
         maxSlots = 99
         ugcType = item
         nOffset1=offsetLocator(playersav,"408494F5") + 4
-        filledSlots = []
     if item == "Clothing":
         maxSlots = 299
         ugcType = "Cloth"
         nOffset1=offsetLocator(playersav,"40710642") + 4
-        filledSlots = []
     if item == "Treasure":
         maxSlots = 99
         ugcType = "Goods"
         nOffset1=offsetLocator(playersav,"2F793EB1") + 4
-        filledSlots = []
     if item == "Interior":
         maxSlots = 99
         ugcType = item
         nOffset1=offsetLocator(playersav,"3DE2C5DD") + 4
-        filledSlots = []
     if item == "Exterior":
         maxSlots = 99
         ugcType = item
         nOffset1=offsetLocator(playersav,"27C875D6") + 4
-        filledSlots = []
     if item == "Objects":
         maxSlots = 99
         ugcType = "MapObject"
         nOffset1=offsetLocator(playersav,"56F99338") + 4
-        filledSlots = []
     if item == "Landscaping":
         maxSlots = 99
         ugcType = "MapFloor"
         nOffset1=offsetLocator(playersav,"918875A9") + 4
-        filledSlots = []
     if item != "Mii":
         New = False
         for x in range(maxSlots):
@@ -745,6 +744,11 @@ modeVar.trace_add("write", updateBackupState)
 updateBackupState()
 
 itemVar.trace_add(
+    "write",
+    lambda *args: getSlots(folderVar.get())
+)
+
+folderVar.trace_add(
     "write",
     lambda *args: getSlots(folderVar.get())
 )
