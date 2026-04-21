@@ -23,3 +23,4 @@ struct ltd {
       u32 texSize;
       u8 texData[texSize];
     }
+}
