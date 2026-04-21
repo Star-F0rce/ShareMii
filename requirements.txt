@@ -1,3 +1,4 @@
 tkinterdnd2
 sv_ttk
 darkdetect
+pillow
