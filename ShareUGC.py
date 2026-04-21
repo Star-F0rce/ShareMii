@@ -20,6 +20,11 @@ ugcTypeIndex = list(["Food","Cloth","Goods","Interior","Exterior","MapObject","M
 
 def ugcStart(mode: str, slot: int, save: str, ugcpath:str, isAdding:bool, ugcKind:int):
 
+    if (ugcpath.startswith('') and ugcpath.endswith('')) or (ugcpath.startswith("") and ugcpath.endswith("")):
+        ugcpath=ugcpath[1:-1]
+    if (save.startswith('') and save.endswith('')) or (save.startswith("") and save.endswith("")):
+        save=save[1:-1]
+
     with open(save + "/Player.sav", "rb") as f:
         playersav = bytearray(f.read())
 

@@ -194,6 +194,11 @@ ugcTypeIndex = list(["Food","Cloth","Goods","Interior","Exterior","MapObject","M
 
 def ShareMii(mode: str, slot: int, save: str, miipath:str, backup:bool = True):
 
+    if (miipath.startswith('') and miipath.endswith('')) or (miipath.startswith("") and miipath.endswith("")):
+        miipath=miipath[1:-1]
+    if (save.startswith('') and save.endswith('')) or (save.startswith("") and save.endswith("")):
+        save=save[1:-1]
+
     if mode == "List":
         slot = 1
 
@@ -658,7 +663,10 @@ def updateSlots(options):
     else:
         slotEntry.current(len(slotEntry["values"]) - 1)
 
-def getSlots(folder): 
+def getSlots(folder):
+
+    if (folder.startswith('') and folder.endswith('')) or (folder.startswith("") and folder.endswith("")):
+        folder=folder[1:-1]
 
     if folderVar.get() == "Drag & drop or upload save folder here":
         return()
