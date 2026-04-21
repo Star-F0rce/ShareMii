@@ -292,8 +292,8 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str, backup:bool = True):
                 mii[ugcStart+1:ugcStart+4] = bytearray.fromhex("A4 A4 A4")
                 mii = mii[:ugcStart + 3] + bytearray([164]) + mii[ugcStart + 3:]
 
-        if mii[30] != 110:
-            raise RuntimeError(".ltd not recognized. Is this really a Mii?")
+        # if mii[30] != 110:
+        #     raise RuntimeError(".ltd not recognized. Is this really a Mii?")
 
         #Find where miis are stored in Mii.sav
         paintindex = fpOffset3 + 4 * (slot)
@@ -666,6 +666,12 @@ def getSlots(folder):
         return()
     if os.path.isfile(folderVar.get()):
         return()
+    
+    if not (os.path.isfile(folder + "/Mii.sav")):
+        raise RuntimeError("Mii.sav not found. Make sure this folder has Mii.sav")
+    if not (os.path.isfile(folder + "/Player.sav")):
+        raise RuntimeError("Player.sav not found. Make sure this folder has Player.sav")
+
     with open(folder + "/Mii.sav", "rb") as f:
         miisav = bytearray(f.read())
 
