@@ -660,7 +660,7 @@ startButton = ttk.Button(root, text="Start!", command=beginProcess, width=20).gr
 guiOutput = ScrolledText(root,height=10,width=40)
 guiOutput.grid(row=8, column=1,sticky=tk.NSEW)
 
-sv_ttk.set_theme(darkdetect.theme())
+sv_ttk.set_theme(darkdetect.theme() or "dark")
 
 def updateSlots(options):
     slotEntry["values"] = options
