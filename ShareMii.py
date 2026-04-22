@@ -102,6 +102,11 @@ def browseFolder():
         else:
             slotEntry.current(1)
 
+def trimStr(path):
+    if (path.startswith("'") and path.endswith("'")) or (path.startswith('"') and path.endswith('"')):
+        path=path[1:-1]
+    return(path)
+
 ## Used to browse files in GUI
 def browseFile():
     # Opens folder selection dialog
@@ -194,10 +199,8 @@ ugcTypeIndex = list(["Food","Cloth","Goods","Interior","Exterior","MapObject","M
 
 def ShareMii(mode: str, slot: int, save: str, miipath:str, backup:bool = True):
 
-    if (miipath.startswith('') and miipath.endswith('')) or (miipath.startswith("") and miipath.endswith("")):
-        miipath=miipath[1:-1]
-    if (save.startswith('') and save.endswith('')) or (save.startswith("") and save.endswith("")):
-        save=save[1:-1]
+    miipath=trimStr(miipath)
+    save=trimStr(save)
 
     if mode == "List":
         slot = 1
@@ -538,9 +541,9 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str, backup:bool = True):
 
 def beginProcess():
     guiOutput.delete("1.0", "end")
-    folder = folderVar.get()
+    folder = trimStr(folderVar.get())
     mode = modeVar.get()
-    file = fileVar.get()
+    file = trimStr(fileVar.get())
     slot = slotVar.get()
     item = itemVar.get()
     backup = backupVar.get()
@@ -574,13 +577,13 @@ def beginProcess():
             names = names[1:]
         else:
             names = names[:len(names) - 1]
-        for x in range(len(names)):
-            slot = names[x]
-            slot = int(slot.split(" - ")[0])
-            if item == "-1":
-                ShareMii(mode, slot, folder, file, backup)
-            else:
-                ugcStart(mode, slot, folder, file, isAdding, item)
+            for x in range(len(names)):
+                slot = names[x]
+                slot = int(slot.split(" - ")[0])
+                if item == -1:
+                    ShareMii(mode, slot, folder, file, backup)
+                else:
+                    ugcStart(mode, slot, folder, file, isAdding, item)
 
 ##GUI Setup
 root = TkinterDnD.Tk()
@@ -665,8 +668,7 @@ def updateSlots(options):
 
 def getSlots(folder):
 
-    if (folder.startswith('') and folder.endswith('')) or (folder.startswith("") and folder.endswith("")):
-        folder=folder[1:-1]
+    folder=trimStr(folder)
 
     if folderVar.get() == "Drag & drop or upload save folder here":
         return()
@@ -674,11 +676,6 @@ def getSlots(folder):
         return()
     if os.path.isfile(folderVar.get()):
         return()
-    
-    if not (os.path.isfile(folder + "/Mii.sav")):
-        raise RuntimeError("Mii.sav not found. Make sure this folder has Mii.sav")
-    if not (os.path.isfile(folder + "/Player.sav")):
-        raise RuntimeError("Player.sav not found. Make sure this folder has Player.sav")
 
     with open(folder + "/Mii.sav", "rb") as f:
         miisav = bytearray(f.read())

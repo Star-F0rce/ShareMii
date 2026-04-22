@@ -18,12 +18,15 @@ def offsetLocator(file, hashStr):
 ugcTypeString = list(["Food","Clothing","Treasure","Interior","Exterior","Objects","Landscaping"])
 ugcTypeIndex = list(["Food","Cloth","Goods","Interior","Exterior","MapObject","MapFloor"])
 
+def trimStr(path):
+    if (path.startswith("'") and path.endswith("'")) or (path.startswith('"') and path.endswith('"')):
+        path=path[1:-1]
+    return(path)
+
 def ugcStart(mode: str, slot: int, save: str, ugcpath:str, isAdding:bool, ugcKind:int):
 
-    if (ugcpath.startswith('') and ugcpath.endswith('')) or (ugcpath.startswith("") and ugcpath.endswith("")):
-        ugcpath=ugcpath[1:-1]
-    if (save.startswith('') and save.endswith('')) or (save.startswith("") and save.endswith("")):
-        save=save[1:-1]
+    save=trimStr(save)
+    ugcpath=trimStr(ugcpath)
 
     with open(save + "/Player.sav", "rb") as f:
         playersav = bytearray(f.read())
