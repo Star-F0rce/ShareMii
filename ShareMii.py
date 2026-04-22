@@ -167,6 +167,21 @@ def offsetLocator(file, hashStr):
     
     return offset
 
+def uniqueFile(filepath):
+    if not os.path.exists(filepath):
+        return filepath
+
+    base, ext = os.path.splitext(filepath)
+    counter = 1
+    newFilepath = f"{base}_({counter}){ext}"
+
+    while os.path.exists(newFilepath):
+        counter += 1
+        newFilepath = f"{base}_({counter}){ext}"
+
+    return newFilepath
+
+
 ## Handles the sexuality bytes
 def DecodeSexuality(data: bytearray) -> list[int]:
     return [int(bit) for byte in data for bit in f"{byte:08b}"[::-1]]
@@ -531,6 +546,8 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str, backup:bool = True):
 
         if ".ltd" not in miipath:
             miipath += ".ltd"
+
+        miipath=uniqueFile(miipath)
 
         with open(miipath, "wb") as f:
             f.write(output)

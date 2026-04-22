@@ -24,6 +24,20 @@ def trimStr(path):
         path=path[1:-1]
     return(path)
 
+def uniqueFile(filepath):
+    if not os.path.exists(filepath):
+        return filepath
+
+    base, ext = os.path.splitext(filepath)
+    counter = 1
+    newFilepath = f"{base}_({counter}){ext}"
+
+    while os.path.exists(newFilepath):
+        counter += 1
+        newFilepath = f"{base}_({counter}){ext}"
+
+    return newFilepath
+
 def ugcStart(mode: str, slot: int, save: str, ugcpath:str, isAdding:bool, ugcKind:int):
 
     save=trimStr(save)
@@ -363,6 +377,8 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
 
         if fExtensionDef not in ugcpath:
             ugcpath += fExtensionDef
+
+        ugcpath=uniqueFile(ugcpath)
 
         with open(ugcpath, "wb") as f:
             f.write(output)
