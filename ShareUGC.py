@@ -2,6 +2,7 @@ import struct
 import os
 import re
 from pathlib import Path
+import stat
 
 def offsetLocator(file, hashStr):
     hash = bytes.fromhex(hashStr)
@@ -365,5 +366,6 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
 
         with open(ugcpath, "wb") as f:
             f.write(output)
+        os.chmod(ugcpath, stat.S_IREAD)
 
         print("Success! " + printName.decode("utf-16") + " written to " + ugcpath)

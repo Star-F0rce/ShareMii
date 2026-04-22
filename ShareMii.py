@@ -14,6 +14,7 @@ from tkinter import filedialog
 from tkinter.scrolledtext import ScrolledText
 from tkinterdnd2 import DND_FILES, TkinterDnD
 from ShareUGC import ugcStart,shareUGC
+import stat
 
 majVersion = 3
 minVersion = 2
@@ -533,6 +534,8 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str, backup:bool = True):
 
         with open(miipath, "wb") as f:
             f.write(output)
+
+        os.chmod(miipath, stat.S_IREAD)
         
         if slot == -1:
             name=bytearray.fromhex("54 00 65 00 6D 00 70")
