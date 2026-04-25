@@ -1,0 +1,80 @@
+version: 1
+
+script:
+  - rm -rf AppDir
+  - mkdir -p AppDir/usr/bin
+  - mkdir -p AppDir/usr/share/tomodachis
+  - mkdir -p AppDir/usr/share/applications
+  - mkdir -p AppDir/usr/share/metainfo
+  - mkdir -p AppDir/usr/share/icons
+  - cp Tomodachis.py ShareUGC.py AppDir/usr/share/tomodachis/
+  - cp -r icons/* AppDir/usr/share/icons/
+  - install -Dm644 icons/hicolor/256x256/apps/com.pocoguy.Tomodachis.png AppDir/com.pocoguy.Tomodachis.png
+  - |
+    cat > AppDir/usr/share/applications/com.pocoguy.Tomodachis.desktop <<'EOF'
+    [Desktop Entry]
+    Type=Application
+    Name=Tomodachis
+    GenericName=Tomodachi Life Save Editor
+    Comment=Import and export Miis from Tomodachi Life: Living the Dream save data
+    Exec=tomodachis %F
+    Icon=com.pocoguy.Tomodachis
+    Categories=Utility;
+    Terminal=false
+    StartupNotify=true
+    EOF
+  - |
+    cat > AppDir/usr/bin/tomodachis <<'EOF'
+    #!/usr/bin/env bash
+    HERE="$(dirname "$(readlink -f "$0")")"
+    exec python3 "${HERE}/../share/tomodachis/Tomodachis.py" "$@"
+    EOF
+  - chmod +x AppDir/usr/bin/tomodachis
+
+AppDir:
+  path: ./AppDir
+
+  app_info:
+    id: com.pocoguy.Tomodachis
+    name: Tomodachis
+    icon: com.pocoguy.Tomodachis
+    version: !ENV ${APP_VERSION}
+    exec: usr/bin/python3
+    exec_args: "$APPDIR/usr/share/tomodachis/Tomodachis.py $@"
+
+  apt:
+    arch: amd64
+    sources:
+      - sourceline: 'deb http://archive.ubuntu.com/ubuntu/ noble main restricted universe multiverse'
+        key_url: 'http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C'
+      - sourceline: 'deb http://archive.ubuntu.com/ubuntu/ noble-updates main restricted universe multiverse'
+      - sourceline: 'deb http://security.ubuntu.com/ubuntu/ noble-security main restricted universe multiverse'
+
+    include:
+      - python3
+      - python3-gi
+      - python3-gi-cairo
+      - gir1.2-gtk-4.0
+      - gir1.2-adw-1
+      - libadwaita-1-0
+      - libgtk-4-1
+      - libglib2.0-0t64
+
+    exclude:
+      - python3-pip
+      - python3-setuptools
+
+  files:
+    exclude:
+      - usr/share/man
+      - usr/share/doc
+      - usr/share/locale
+
+  runtime:
+    env:
+      PYTHONPATH: '${APPDIR}/usr/lib/python3/dist-packages:${APPDIR}/usr/share/tomodachis'
+
+AppImage:
+  arch: x86_64
+  comp: gzip
+  update-information: guess
