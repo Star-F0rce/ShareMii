@@ -76,5 +76,4 @@ AppDir:
 
 AppImage:
   arch: x86_64
-  comp: gzip
   update-information: guess
