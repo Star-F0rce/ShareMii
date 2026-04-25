@@ -40,6 +40,19 @@ jobs:
           /tmp/builder/bin/pip install 'packaging<22' appimage-builder
           echo "/tmp/builder/bin" >> "$GITHUB_PATH"
 
+      - name: Patch appimage-builder bugs
+        # 1. APPDIR_LIBC_LINKER_PATH is serialized as a Python set repr ("{'...'}")
+        #    instead of a colon-joined path. Pass a list so the env serializer
+        #    handles it correctly.
+        # 2. (Handled in build step) compat runtime is missing the relative
+        #    ld-linux symlink that AppRun chdirs to.
+        run: |
+          f=$(echo /tmp/builder/lib/python*/site-packages/appimagebuilder/modules/setup/apprun_2/apprun2.py)
+          sed -i \
+            's|set(patcher.binary_interpreters_paths.values())|list(set(patcher.binary_interpreters_paths.values()))|' \
+            "$f"
+          grep -n "APPDIR_LIBC_LINKER_PATH" "$f"
+
       - name: Compute version
         id: version
         run: |
@@ -51,12 +64,41 @@ jobs:
           echo "version=${v}" >> "$GITHUB_OUTPUT"
           echo "Building Tomodachis ${v}"
 
-      - name: Build AppImage
+      - name: Build AppDir
         env:
           APP_VERSION: ${{ steps.version.outputs.version }}
           APPIMAGE_EXTRACT_AND_RUN: '1'
         run: |
-          appimage-builder --recipe AppImageBuilder.yml --skip-tests
+          appimage-builder --recipe AppImageBuilder.yml --skip-tests --skip-appimage
+
+      - name: Fix up compat runtime
+        # appimage-builder creates runtime/default/lib64/ld-linux-x86-64.so.2 ->
+        # host /lib64/ld-linux-x86-64.so.2 so the patched ELF interpreter
+        # ("lib64/ld-linux-x86-64.so.2", relative) resolves once AppRun chdirs
+        # to runtime/default/. It does not do the same for runtime/compat/, so
+        # any host that AppRun classifies as "incompatible with bundled glibc"
+        # (e.g. anything where libc isn't at /lib/x86_64-linux-gnu/libc.so.6,
+        # which includes Arch and Fedora) falls into compat and immediately
+        # ENOENTs on the missing symlink. Mirror it here.
+        run: |
+          set -e
+          ld_in_compat=$(find AppDir/runtime/compat -name 'ld-linux-x86-64.so.2' -type f -print -quit)
+          if [ -z "$ld_in_compat" ]; then
+            echo "No bundled ld-linux under runtime/compat — nothing to do."
+            exit 0
+          fi
+          target_dir="AppDir/runtime/compat/lib64"
+          mkdir -p "$target_dir"
+          rel=$(realpath --relative-to="$target_dir" "$ld_in_compat")
+          ln -sfn "$rel" "$target_dir/ld-linux-x86-64.so.2"
+          ls -l "$target_dir/ld-linux-x86-64.so.2"
+
+      - name: Package AppImage
+        env:
+          APP_VERSION: ${{ steps.version.outputs.version }}
+          APPIMAGE_EXTRACT_AND_RUN: '1'
+        run: |
+          appimage-builder --recipe AppImageBuilder.yml --skip-tests --skip-script --skip-build
 
       - name: Show built artifacts
         run: ls -lh ./*.AppImage* || true

@@ -44,11 +44,14 @@ AppDir:
 
   apt:
     arch: amd64
+    # Pulling from Ubuntu 26.04 LTS (resolute) so the bundled libadwaita
+    # is 1.9.x and GTK is 4.22.x, matching what current GNOME systems run.
+    # Noble (24.04) only has libadwaita 1.5, which has the old window styling.
     sources:
-      - sourceline: 'deb http://archive.ubuntu.com/ubuntu/ noble main restricted universe multiverse'
+      - sourceline: 'deb http://archive.ubuntu.com/ubuntu/ resolute main restricted universe multiverse'
         key_url: 'http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C'
-      - sourceline: 'deb http://archive.ubuntu.com/ubuntu/ noble-updates main restricted universe multiverse'
-      - sourceline: 'deb http://security.ubuntu.com/ubuntu/ noble-security main restricted universe multiverse'
+      - sourceline: 'deb http://archive.ubuntu.com/ubuntu/ resolute-updates main restricted universe multiverse'
+      - sourceline: 'deb http://security.ubuntu.com/ubuntu/ resolute-security main restricted universe multiverse'
 
     include:
       - python3
@@ -59,6 +62,8 @@ AppDir:
       - libadwaita-1-0
       - libgtk-4-1
       - libglib2.0-0t64
+      - adwaita-icon-theme
+      - hicolor-icon-theme
 
     exclude:
       - python3-pip
