@@ -1,3 +1,10 @@
 *.bat
 /__pycache__
 /backup
+
+# AppImage build artifacts
+/AppDir/
+/appimage-build/
+/.bundle.yml
+*.AppImage
+*.AppImage.zsync
