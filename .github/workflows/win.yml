@@ -14,4 +14,4 @@ jobs:
           spec: 'ShareMii.py'
           requirements: 'requirements.txt'
           upload_exe_with_name: 'ShareMii-winx64'
-          options: --onefile, --name "ShareMii", --add-data "icon.png:.", --add-data "logo.png:.", --windowed, --icon "icon.ico"
+          options: --name "ShareMii", --add-data "icon.png:.", --add-data "logo.png:.", --windowed, --icon "icon.ico"
