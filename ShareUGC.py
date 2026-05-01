@@ -225,11 +225,13 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
 
     ## LIST MODE ###################################################################
     if mode == "List":
-        for x in range(99):
+        for x in range(299):
             if x < 10:
                 ugcFile = "/Ugc"+ ugcType + "00" + str(x) + ".canvas.zs"
-            else:
+            elif x < 99:
                 ugcFile = "/Ugc"+ ugcType + "0" + str(x) + ".canvas.zs"
+            else:
+                ugcFile = "/Ugc"+ ugcType + str(x) + ".canvas.zs"
             ugcName = playersav[nOffsets[0]+((x)*128):nOffsets[0]+((x)*128)+128]
             if os.path.isfile(save + "/Ugc" + ugcFile):
                 ugcPrintName = ugcName[:ugcName.find(bytes.fromhex("00 00 00"))]
@@ -268,8 +270,10 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
 
         if slot < 10:
             ugcFile = ugcType + "00" + str(slot)
-        else:
+        elif slot < 99:
             ugcFile = ugcType + "0" + str(slot)
+        else:
+            ugcFile = ugcType + str(slot)
         #Copying the textures.
         with open(save + "/Ugc/Ugc" + ugcFile + ".canvas.zs", "wb") as f:
             f.write(ugc[canvasStart:ugcStart - 4])
@@ -356,7 +360,7 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
 
         if slot < 10:
             ugcFile = ugcType + "00" + str(slot)
-        elif 11 < slot < 99:
+        elif slot < 99:
             ugcFile = ugcType + "0" + str(slot)
         else:
             ugcFile = ugcType + str(slot)

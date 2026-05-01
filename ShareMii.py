@@ -750,8 +750,10 @@ def getSlots(folder):
         for x in range(maxSlots):
             if x < 10:
                 ugcFile = "/Ugc"+ ugcType + "00" + str(x) + ".canvas.zs"
-            else:
+            elif x < 99:
                 ugcFile = "/Ugc"+ ugcType + "0" + str(x) + ".canvas.zs"
+            else:
+                ugcFile = "/Ugc"+ ugcType + str(x) + ".canvas.zs"
             ugcName = playersav[nOffset1+((x)*128):nOffset1+((x)*128)+128]
             if os.path.isfile(folder + "/Ugc" + ugcFile):
                 ugcPrintName = ugcName[:ugcName.find(bytes.fromhex("00 00 00"))]
