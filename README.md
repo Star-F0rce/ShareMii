@@ -1,6 +1,6 @@
 # ShareMii
 A GUI/CLI Tool written in Python to export and import content from Tomodachi Life: Living the Dream save files.\
-<img width="401" height="241" alt="Screenshot" src="https://github.com/user-attachments/assets/176f5da1-f3ae-492b-aebd-761d54486574" />
+<img width="401" height="291" alt="Sonic Adventure 2" src="https://github.com/user-attachments/assets/51535051-5b1e-41c8-bcf4-54c6a43a7fe1" />
 ## Usage
 To start the GUI, run ShareMii with no arguments
 
