@@ -86,7 +86,7 @@ def resourcePath(relativePath):
     try:
         basePath = sys._MEIPASS
     except Exception:
-        basePath = os.path.abspath(".")
+        basePath = os.path.join(os.path.dirname(__file__))
 
     return os.path.join(basePath, relativePath)
 

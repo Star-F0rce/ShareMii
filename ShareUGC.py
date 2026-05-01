@@ -356,9 +356,10 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
 
         if slot < 10:
             ugcFile = ugcType + "00" + str(slot)
-        else:
+        elif 11 < slot < 99:
             ugcFile = ugcType + "0" + str(slot)
-
+        else:
+            ugcFile = ugcType + str(slot)
         with open(save + "/Ugc/Ugc" + ugcFile + ".canvas.zs", "rb") as f:
             canvastex = bytearray(f.read())
         with open(save + "/Ugc/Ugc" + ugcFile + ".ugctex.zs", "rb") as f:
