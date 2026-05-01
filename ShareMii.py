@@ -18,7 +18,7 @@ import stat
 
 majVersion = 3
 minVersion = 2
-patchVersion = 1
+patchVersion = 2
 preVersion = 0
 if preVersion:
     preVersion = str(".pre" + str(preVersion))
