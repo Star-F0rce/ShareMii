@@ -18,6 +18,8 @@ If your code directly ports how importing/exporting works from this repo, I'd ap
 I would hold off on making code that parses .ltds at the moment. We're currently working on completely rewriting the ltd format to be more compatible with the game's libraries.\
 If you're just supporting uploads of .ltds, you're fine, there won't be a release of the new format unless there's a working v3 -> v4 conversion.
 
+This tool is built using PyInstaller, which can be flagged as malware on Windows. It's a false positive due to the way PyInstaller works, and how some malware also uses PyInstaller. The multifile download for Windows should be safe from this.
+
 ## Building
 Executables are built with PyInstaller. To build one, clone the repository and run\
 pip install pyinstaller\
