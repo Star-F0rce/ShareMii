@@ -593,17 +593,18 @@ def beginProcess():
         file = os.path.join(file,"auto")
         mode = "Export"
         names = slotEntry["values"]
-        if item == "-1":
+        if item == -1:
             names = names[1:]
         else:
             names = names[:len(names) - 1]
-            for x in range(len(names)):
-                slot = names[x]
-                slot = int(slot.split(" - ")[0])
-                if item == -1:
-                    ShareMii(mode, slot, folder, file, backup)
-                else:
-                    ugcStart(mode, slot, folder, file, isAdding, item)
+
+        for x in range(len(names)):
+            slot = names[x]
+            slot = int(slot.split(" - ")[0])
+            if item == -1:
+                ShareMii(mode, slot, folder, file, backup)
+            else:
+                ugcStart(mode, slot, folder, file, isAdding, item)
 
 ##GUI Setup
 root = TkinterDnD.Tk()
