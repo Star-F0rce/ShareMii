@@ -16,6 +16,20 @@ def offsetLocator(file, hashStr):
     
     return offset
 
+def DecodeBits(data: bytearray) -> list[int]:
+    return [int(bit) for byte in data for bit in f"{byte:08b}"[::-1]]
+
+def EncodeBits(bits: list[int]) -> bytearray:
+    if len(bits) % 8 != 0:
+        raise ValueError("Bit list length must be a multiple of 8")
+    result = bytearray()
+    for i in range(0, len(bits), 8):
+        byte_bits = bits[i:i+8]
+        byte_str = ''.join(str(bit) for bit in byte_bits[::-1])
+        result.append(int(byte_str, 2))
+
+    return result
+
 ugcTypeString = list(["Food","Clothing","Treasure","Interior","Exterior","Objects","Landscaping"])
 ugcTypeIndex = list(["Food","Cloth","Goods","Interior","Exterior","MapObject","MapFloor"])
 
@@ -221,6 +235,7 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
     HOffset7=offsetLocator(playersav,"816D50A3") + 4 # MapFloor
     ugcHashOffsets = list([HOffset1,HOffset2,HOffset3,HOffset4,HOffset5,HOffset6,HOffset7])
     ugcHashIndex = list([1,3,2,6,7,4,5])
+    nightLightIndex = list([5,6,13,4,7,9,4])
     ugcTexData = bytearray.fromhex("41 49 93 56 E3 C2 2F B4 41 49 93 56 E3 C2 2F B4 E3 C2 2F B4 E3 C2 2F B4 E3 C2 2F B4")
 
     ## LIST MODE ###################################################################
@@ -292,7 +307,20 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
             print("Replacing UGC data...")
         # Apply personality changes
         for x in range(len(ugcOffsets)):
-            playersav[ugcOffsets[x]+(slot)*4:ugcOffsets[x]+(slot)*4+4] = ugc[4+x*4:4+x*4+4]
+            if x == nightLightIndex[ugcKind]:
+                bits = 13
+                if ugcKind == 1:
+                    bits = 38
+                light = playersav[ugcOffsets[x]:ugcOffsets[x]+bits]
+                light = DecodeBits(light)
+                if ugc[1] > 0:
+                    light[slot]=ugc[4+x*4]
+                else:
+                    light[slot]=0
+                light = EncodeBits(light)
+                playersav[ugcOffsets[x]:ugcOffsets[x]+bits] = light
+            else:
+                playersav[ugcOffsets[x]+(slot)*4:ugcOffsets[x]+(slot)*4+4] = ugc[4+x*4:4+x*4+4]
 
         if isAdding:
             playersav[ugcEnableOffsets[ugcKind]+(slot)*4:ugcEnableOffsets[ugcKind]+(slot)*4+4] = bytearray.fromhex("F4 AD 7F 1D")
@@ -325,10 +353,20 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
         ugcData=bytearray()
         # This loop grabs nearly all personality aspects from a Mii
         for x in range(len(ugcOffsets)):
-            CurrentUGCV=playersav[ugcOffsets[x]+(slot)*4:ugcOffsets[x]+(slot)*4+4]
+            if x == nightLightIndex[ugcKind]:
+                # Save night light bit
+                bits = 13
+                if ugcKind == 1:
+                    bits = 38
+                light = playersav[ugcOffsets[x]:ugcOffsets[x]+bits]
+                light = DecodeBits(light)
+                light=list([light[(slot)]])
+                CurrentUGCV = light + [0] * 3
+            else:
+                CurrentUGCV=playersav[ugcOffsets[x]+(slot)*4:ugcOffsets[x]+(slot)*4+4]
             ugcData.extend(CurrentUGCV)
         
-        ltdData = bytearray([ugcKind, 0, 0, 0])
+        ltdData = bytearray([ugcKind, 1, 0, 0])
         name = playersav[nOffsets[0]+((slot)*128):nOffsets[0]+((slot)*128)+128]
         pronounce = playersav[nOffsets[1]+((slot)*128):nOffsets[1]+((slot)*128)+128]
         if ugcKind ==2:
