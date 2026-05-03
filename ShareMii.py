@@ -498,10 +498,7 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str, backup:bool = True):
         canvasSection = bytearray.fromhex('A3 A3 A3 A3')
         ugcSection = bytearray.fromhex('A4 A4 A4 A4')
         #Actually create the Mii file
-        if slot == -1:
-            miiVersion = 1
-        else:
-            miiVersion = 3
+        miiVersion = 4
         ltdData = bytearray(3)
         #If facepaint is detected, copy and rename them
         if facepaint:
