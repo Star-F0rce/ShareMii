@@ -313,7 +313,7 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
                     bits = 38
                 light = playersav[ugcOffsets[x]:ugcOffsets[x]+bits]
                 light = DecodeBits(light)
-                if ugc[1] > 0:
+                if ugc[4+x*4] in (0,1):
                     light[slot]=ugc[4+x*4]
                 else:
                     light[slot]=0
@@ -366,7 +366,7 @@ def shareUGC(mode: str, slot: int, save: str, ugcpath:str, ugcKind:int, ugcOffse
                 CurrentUGCV=playersav[ugcOffsets[x]+(slot)*4:ugcOffsets[x]+(slot)*4+4]
             ugcData.extend(CurrentUGCV)
         
-        ltdData = bytearray([ugcKind, 1, 0, 0])
+        ltdData = bytearray([ugcKind, 0, 0, 0])
         name = playersav[nOffsets[0]+((slot)*128):nOffsets[0]+((slot)*128)+128]
         pronounce = playersav[nOffsets[1]+((slot)*128):nOffsets[1]+((slot)*128)+128]
         if ugcKind ==2:
