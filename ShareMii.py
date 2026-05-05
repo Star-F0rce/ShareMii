@@ -577,8 +577,10 @@ def beginProcess():
     if slot.split(" - ")[1] == "Add New Item":
         isAdding = True
     slot = int(slot.split(" - ")[0])
-    if (mode == "Export" or mode =="Export All") & (isAdding == True):
+    if (mode == "Export") & (isAdding == True):
         raise RuntimeError("You can't use this slot with this mode.")
+    if (mode == "Export All") & (isAdding == True):
+        slot = 1
 
     if (file == "Drag & drop or upload .ltd(x) here") & (mode == "Export"):
         file = "auto"
