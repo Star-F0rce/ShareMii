@@ -265,6 +265,7 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str, backup:bool = True):
     persOffsetB3=offsetLocator(miisav,"2545E583") + 4 # Mii.MiiMisc.BirthdayInfo.DirectAge
     persOffsetB4=offsetLocator(miisav,"6CF484F4") + 4 # Mii.MiiMisc.BirthdayInfo.Month
     persOffsetSX=offsetLocator(miisav,"DFC82223") + 4 # Mii.MiiMisc.FaceInfo.IsLoveGender
+    levelOffset=offsetLocator(miisav,"9999B7D9") + 4 # Mii.MiiMisc.SatisfyInfo.Level
     persOffsets=list([persOffsetP1,persOffsetP2,persOffsetP3,persOffsetP4,persOffsetP5,persOffsetV1,persOffsetV2,persOffsetV3,persOffsetV4,persOffsetV5,persOffsetV6,persOffsetS1,persOffsetS2,persOffsetS3,persOffsetB1,persOffsetB2,persOffsetB3,persOffsetB4])
 
     # Searchable Offsets
@@ -436,12 +437,15 @@ def ShareMii(mode: str, slot: int, save: str, miipath:str, backup:bool = True):
 
             miisav[miinames+((slot)*64):miinames+((slot)*64)+64] = mii[232:296]
             miisav[miiprefer+((slot)*128):miiprefer+((slot)*128)+128] = mii[296:424]
-            miisexuality=list(mii[424:427])
-            sexuality = miisav[persOffsetSX:persOffsetSX+27]
-            sexuality = DecodeSexuality(sexuality)
-            sexuality[(slot)*3:(slot)*3+3]=miisexuality
-            sexuality = EncodeSexuality(sexuality)
-            miisav[persOffsetSX:persOffsetSX+27] = sexuality
+            if miisav[levelOffset+(slot*4)] < 2:
+                miisexuality=list(mii[424:427])
+                sexuality = miisav[persOffsetSX:persOffsetSX+27]
+                sexuality = DecodeSexuality(sexuality)
+                sexuality[(slot)*3:(slot)*3+3]=miisexuality
+                sexuality = EncodeSexuality(sexuality)
+                miisav[persOffsetSX:persOffsetSX+27] = sexuality
+            else:
+                print("Mii is over level 1! Skipping sexuality...")
             print("Personal data replaced!")
 
         with open(save + "/Mii.sav", "wb") as f:
